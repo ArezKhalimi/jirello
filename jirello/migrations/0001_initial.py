@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField()),
                 ('original_estimate', models.PositiveIntegerField()),
                 ('remaining_estimate', models.PositiveIntegerField()),
-                ('storypoints', models.PositiveSmallIntegerField(default=0, null=True, choices=[(2, b'1'), (3, b'2'), (4, b'3'), (5, b'5'), (6, b'8'), (7, b'13'), (8, b'21')])),
+                ('storypoints', models.PositiveSmallIntegerField(default=0, null=True, choices=[(1, b'1'), (2, b'2'), (3, b'3'), (4, b'5'), (5, b'8'), (6, b'13'), (7, b'21')])),
             ],
         ),
         migrations.CreateModel(
@@ -59,28 +59,29 @@ class Migration(migrations.Migration):
             name='Worklog',
             fields=[
                 ('comment_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='jirello.Comment')),
+                ('time_spend', models.PositiveIntegerField()),
             ],
             bases=('jirello.comment',),
         ),
         migrations.AddField(
             model_name='task',
             name='owner',
-            field=models.ForeignKey(related_name='own', to='jirello.User'),
+            field=models.ForeignKey(related_name='created_tasks', to='jirello.User'),
         ),
         migrations.AddField(
             model_name='task',
             name='sprints',
-            field=models.ManyToManyField(related_name='task', to='jirello.Sprint'),
+            field=models.ManyToManyField(related_name='tasks', to='jirello.Sprint'),
         ),
         migrations.AddField(
             model_name='task',
             name='worker',
-            field=models.ForeignKey(related_name='task', to='jirello.User'),
+            field=models.ForeignKey(related_name='tasks', to='jirello.User'),
         ),
         migrations.AddField(
             model_name='sprint',
             name='owner',
-            field=models.ForeignKey(related_name='sprint', to='jirello.User'),
+            field=models.ForeignKey(related_name='created_sprints', to='jirello.User'),
         ),
         migrations.AddField(
             model_name='comment',
