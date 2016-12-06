@@ -5,16 +5,17 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate as auth_authenticate
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
+
 
 def register(request):
     register_form = RegistrationForm()
     if request.method == 'POST':
         register_form = RegistrationForm(data=request.POST)
         if register_form.is_valid():
-            user = register_form.save()
+            register_form.save()
     return render(request,
                   'jirello/register.html',
                   {'register_form': register_form})
@@ -25,7 +26,7 @@ def login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user = authenticate(username=username, password=password)
+        user = auth_authenticate(username=username, password=password)
 
         if user:
             if user.is_active:
@@ -54,3 +55,7 @@ def main(request):
         'task_list': task_list,
         "sprint_list": sprint_list}
     return render(request,'jirello/main_page.html', context_dict)
+
+
+def password_change(request):
+    pass

@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
 	<body>
-<h1> hello world!</h1>
+<h1> hello world! {{ user }} </h1>
 {{ task_list }}
 <br>
 {{ sprint_list }}
 <br>
  	<a href="{% url 'register' %}">register</a>
+ 	{% if not user.is_authenticated %}
     <a href="{% url 'login' %}">login</a>
+    {% elif user.is_authenticated %}
     <a href="{% url 'logout' %}">logout</a>
+    {% endif %}
 </html>
