@@ -1,15 +1,15 @@
 from django import forms
-from accounts.models import User
+from jirello.models.user_model import User
 
 
 class RegistrationForm(forms.ModelForm):
     # Form for registering a new account.
     username = forms.CharField(
         error_messages={'required': 'Please enter your name'})
-    email = forms.EmailField(widget=forms.widget.TextInput, label="Email")
-    password1 = forms.CharField(widget=forms.widget.PasswordInput,
+    email = forms.EmailField(widget=forms.TextInput, label="Email")
+    password1 = forms.CharField(widget=forms.PasswordInput,
                                 label="Password")
-    password2 = forms.CharField(widget=forms.widget.PasswordInput,
+    password2 = forms.CharField(widget=forms.PasswordInput,
                                 label="Password (again)")
 
     class Meta:
@@ -34,8 +34,8 @@ class RegistrationForm(forms.ModelForm):
 
 class AuthenticationForm(forms.Form):
     # Login form
-    username = forms.CharField(widget=forms.widgets.TextInput)
-    password = forms.CharField(widget=forms.widgets.PasswordInput)
+    username = forms.CharField(widget=forms.TextInput)
+    password = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
         fields = ['username', 'password']

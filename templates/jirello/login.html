@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+	<body>
+<h1>Login</h1>
+        <form method="post" action="/jirello/login/">
+                {% csrf_token %}
+                {{ auth_form.as_p }}
+
+                <input type="submit" value="Log in" />
+                </form>
+
+        <p>Not  a member? <a href="{% url 'register' %}">Register</a>!</p>
+    </body>
+</html>

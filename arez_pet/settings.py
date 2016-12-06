@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+AUTH_USER_MODEL = 'jirello.User'
 # Application definition
 
 INSTALLED_APPS = (
@@ -53,10 +53,14 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'arez_pet.urls'
 
+
+TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_PATH],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

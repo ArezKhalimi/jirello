@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import UserManager
 
 
 class User(AbstractBaseUser):
@@ -13,6 +14,8 @@ class User(AbstractBaseUser):
     is_super = models.BooleanField(default=False)
     picture = models.ImageField(upload_to='/profile_images', blank=True)
     USERNAME_FIELD = 'username'
+
+    objects = UserManager()
 
     def __unicode__(self):
         return self.username

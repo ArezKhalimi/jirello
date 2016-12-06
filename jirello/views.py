@@ -1,3 +1,56 @@
 from django.shortcuts import render
+from jirello.models import User, Task, Sprint
+from jirello.forms import RegistrationForm, AuthenticationForm
+from django.http import HttpResponse, HttpResponseRedirect
 
-# Create your views here.
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import login as auth_login
+
+def register(request):
+    register_form = RegistrationForm()
+    if request.method == 'POST':
+        register_form = RegistrationForm(data=request.POST)
+        if register_form.is_valid():
+            user = register_form.save()
+    return render(request,
+                  'jirello/register.html',
+                  {'register_form': register_form})
+
+
+def login(request):
+    auth_form = AuthenticationForm()
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(username=username, password=password)
+
+        if user:
+            if user.is_active:
+                auth_login(request, user)
+                return HttpResponseRedirect('/jirello/')
+            else:
+                return HttpResponse("Your Rango account is disabled.")
+        else:
+            print "Invalid login details: {0}, {1}".format(username, password)
+            return HttpResponse(
+                "Your username and password didn't match. Please try again.")
+    else:
+        return render(request, 'jirello/login.html', {'auth_form': auth_form})
+
+
+@login_required(login_url='/jirello/login/')
+def logout(request):
+    auth_logout(request)
+    return HttpResponseRedirect('/jirello/')
+
+
+def main(request):
+    task_list = Task.objects.all()
+    sprint_list = Sprint.objects.all()
+    context_dict = {
+        'task_list': task_list,
+        "sprint_list": sprint_list}
+    return render(request,'jirello/main_page.html', context_dict)
