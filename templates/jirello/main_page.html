@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 	<body>
-<h1> hello world! {{ user }} </h1> {{user.picture}}
-
+<h1> hello world!</h1>
+{% load staticfiles %}
+{% if user.is_authenticated %}
+<h1>{{ user }}</h1>
 		{% if user.picture == '' %}
-			foo
-    		<img align="right" width="150" height="150" src="{{ MEDIA_URL }}none_avatar.jpg/"></br>
+    		<img align="right" width="150" height="150" src="/media/no_avatar.jpg/"></br>
 
 		{% else %}
-		bar
-    		<img align="right" width="150" height="150" src="{{ MEDIA_URL }}{{ user.picture }}"></br>
+    		<img align="right" width="150" height="150" src="/media/{{ user.picture }}"></br>
 		{% endif %}
-
+{% endif %}
 {{ task_list }}
 <br>
 {{ sprint_list }}
