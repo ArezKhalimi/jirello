@@ -2,6 +2,16 @@
 <html>
 	<body>
 <h1> hello world! {{ user }} </h1> {{user.picture}}
+
+		{% if user.picture == '' %}
+			foo
+    		<img align="right" width="150" height="150" src="{{ MEDIA_URL }}none_avatar.jpg/"></br>
+
+		{% else %}
+		bar
+    		<img align="right" width="150" height="150" src="{{ MEDIA_URL }}{{ user.picture }}"></br>
+		{% endif %}
+
 {{ task_list }}
 <br>
 {{ sprint_list }}
