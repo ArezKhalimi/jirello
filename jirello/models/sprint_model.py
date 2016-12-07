@@ -6,6 +6,7 @@ class Sprint(models.Model):
     title = models.CharField(max_length=128, unique=True)
     date_start = models.DateTimeField()
     date_end = models.DateTimeField()
+    is_active = models.BooleanField()
 
     owner = models.ForeignKey(to=User, related_name='created_sprints')
 

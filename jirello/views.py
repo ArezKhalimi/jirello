@@ -3,7 +3,6 @@ from jirello.models import User, Task, Sprint
 from jirello.forms import RegistrationForm, AuthenticationForm
 from django.http import HttpResponse, HttpResponseRedirect
 
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate as auth_authenticate
 from django.contrib.auth import logout as auth_logout
@@ -54,7 +53,7 @@ def main(request):
     context_dict = {
         'task_list': task_list,
         "sprint_list": sprint_list}
-    return render(request,'jirello/main_page.html', context_dict)
+    return render(request, 'jirello/main_page.html', context_dict)
 
 
 def password_change(request):
