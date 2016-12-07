@@ -8,7 +8,7 @@ class User(AbstractUser):
     Custom user class. at this
     http://blackglasses.me/2013/09/17/custom-django-user-model/
     """
-    picture = models.ImageField(upload_to='/profile_images', blank=True)
+    picture = models.ImageField(upload_to='user_profile_images', blank=True)
     objects = UserManager()
 
     def __unicode__(self):
