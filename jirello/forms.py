@@ -1,5 +1,6 @@
 from django import forms
 from jirello.models.user_model import User
+from jirello.models.project_model import ProjectModel
 
 
 class RegistrationForm(forms.ModelForm):
@@ -39,3 +40,12 @@ class AuthenticationForm(forms.Form):
 
     class Meta:
         fields = ['username', 'password']
+
+
+class ProjectForm(forms.ModelForm):
+    title = forms.CharField(max_length=100)
+    description = forms.CharField(max_length=100)
+    users = forms.ModelMultipleChoiceField(queryset=User.objects.all())
+    class Meta:
+        model = ProjectModel
+        fields = ['title', 'description', 'users']

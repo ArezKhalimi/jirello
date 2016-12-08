@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from jirello.models import User, Task, Sprint
-from jirello.forms import RegistrationForm, AuthenticationForm
+from jirello.models import User, Task, Sprint, ProjectModel
+from jirello.forms import RegistrationForm, AuthenticationForm, ProjectForm
 from django.http import HttpResponse, HttpResponseRedirect
 
 from django.contrib.auth.decorators import login_required
@@ -66,3 +66,22 @@ def main(request):
 
 def password_change(request):
     pass
+
+
+@login_required(login_url='/jirello/login/')
+def projects(request):
+    form = ProjectForm()
+    # import pdb; pdb.set_trace()
+    if ProjectModel.objects.filter(users__id=request.user.id).exists():
+        print('ALL IN')
+        projects_list = ProjectModel.objects.filter(users__id=request.user.id)
+    else:
+        print('FAIL')
+        projects_list = 'sory you are have not any projects'
+    if request.method == 'POST':
+        form = ProjectForm(request.POST)
+        if form.is_valid:
+            form.save()
+
+    context_dict = {'form' : form, 'projects_list' : projects_list}
+    return render(request, 'jirello/project_page.html', context_dict)
