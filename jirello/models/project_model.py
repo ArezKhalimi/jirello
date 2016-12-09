@@ -10,6 +10,9 @@ class ProjectModel(models.Model):
     sprints = models.ForeignKey(to=Sprint, related_name='projects', null=True)
     users = models.ManyToManyField(to=User, related_name='users')
 
+    def __unicode__(self):
+            return self.title
+
 
 class ProjectModelManager(models.Manager):
     pass

@@ -45,7 +45,9 @@ class AuthenticationForm(forms.Form):
 class ProjectForm(forms.ModelForm):
     title = forms.CharField(max_length=100)
     description = forms.CharField(max_length=100)
-    users = forms.ModelMultipleChoiceField(queryset=User.objects.all())
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(), widget=forms.CheckboxSelectMultiple())
+
     class Meta:
         model = ProjectModel
         fields = ['title', 'description', 'users']

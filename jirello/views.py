@@ -70,18 +70,31 @@ def password_change(request):
 
 @login_required(login_url='/jirello/login/')
 def projects(request):
-    form = ProjectForm()
-    # import pdb; pdb.set_trace()
     if ProjectModel.objects.filter(users__id=request.user.id).exists():
-        print('ALL IN')
         projects_list = ProjectModel.objects.filter(users__id=request.user.id)
     else:
-        print('FAIL')
-        projects_list = 'sory you are have not any projects'
+        projects_list = None
+
+    context_dict = {'projects_list': projects_list}
+    return render(request, 'jirello/projects.html', context_dict)
+
+
+def new_project(request):
+    form = ProjectForm()
     if request.method == 'POST':
         form = ProjectForm(request.POST)
         if form.is_valid:
             form.save()
+            #return HttpResponseRedirect('jirello/projects.html')
+    context_dict = {'form': form, }
+    return render(request, 'jirello/new_project.html', context_dict)
 
-    context_dict = {'form' : form, 'projects_list' : projects_list}
-    return render(request, 'jirello/project_page.html', context_dict)
+
+def projects_detail(request, projectmodel_id):
+    p = ProjectModel.objects.filter(pk=projectmodel_id)
+    return render(request, 'jirello/project_detail.html', {'p':p})
+    #return HttpResponse("Project id : %s." % projectmodel_id)
+    # if request.method == 'POST':
+    # catch slug
+    # project = get_object_or_404(ProjectModel, slug=slug)
+    # return render(request, 'project-detail.html', {'project':project})
