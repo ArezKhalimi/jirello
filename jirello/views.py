@@ -2,7 +2,7 @@ from django.shortcuts import render
 from jirello.models import User, Task, Sprint, ProjectModel
 from jirello.forms import RegistrationForm, AuthenticationForm, ProjectForm
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate as auth_authenticate
@@ -92,6 +92,7 @@ def new_project(request):
 
 
 def projects_detail(request, projectmodel_id):
+    exist = get_object_or_404(ProjectModel, pk=projectmodel_id)
     project = ProjectModel.objects.filter(pk=projectmodel_id).prefetch_related('users')
     if request.POST.get('delete'):
         project.delete()
