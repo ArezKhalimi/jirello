@@ -7,7 +7,7 @@
     	<a href="{% url 'projects' %}{{ pj.id }}">* {{pj.title}}<br></a>
 	{% endfor %}
 {% else %}
-	<strong>You are have not any projects.</strong><br>
+	<strong>You do not have any projects.</strong><br>
 {% endif %}
  	<a href="{% url 'new_project' %}">Create a new project</a><br>
  	{% if not user.is_authenticated %}
