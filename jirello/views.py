@@ -2,6 +2,7 @@ from django.shortcuts import render
 from jirello.models import User, Task, Sprint, ProjectModel
 from jirello.forms import RegistrationForm, AuthenticationForm, ProjectForm
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate as auth_authenticate
@@ -85,16 +86,14 @@ def new_project(request):
         form = ProjectForm(request.POST)
         if form.is_valid:
             form.save()
-            #return HttpResponseRedirect('jirello/projects.html')
+            return HttpResponseRedirect('/jirello/projects')
     context_dict = {'form': form, }
     return render(request, 'jirello/new_project.html', context_dict)
 
 
 def projects_detail(request, projectmodel_id):
-    p = ProjectModel.objects.filter(pk=projectmodel_id)
-    return render(request, 'jirello/project_detail.html', {'p':p})
-    #return HttpResponse("Project id : %s." % projectmodel_id)
-    # if request.method == 'POST':
-    # catch slug
-    # project = get_object_or_404(ProjectModel, slug=slug)
-    # return render(request, 'project-detail.html', {'project':project})
+    project = ProjectModel.objects.filter(pk=projectmodel_id).prefetch_related('users')
+    if request.POST.get('delete'):
+        project.delete()
+        return HttpResponseRedirect('/jirello/projects')
+    return render(request, 'jirello/project_detail.html', {'project':project})

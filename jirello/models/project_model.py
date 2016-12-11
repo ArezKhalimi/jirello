@@ -8,7 +8,7 @@ class ProjectModel(models.Model):
     description = models.TextField()
 
     sprints = models.ForeignKey(to=Sprint, related_name='projects', null=True)
-    users = models.ManyToManyField(to=User, related_name='users')
+    users = models.ManyToManyField(to=User, related_name='projects')
 
     def __unicode__(self):
             return self.title

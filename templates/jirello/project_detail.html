@@ -2,9 +2,16 @@
 <html>
 	<body>
 <h1> hello world!</h1>
-{% for i in p%}
-	Name	{{i.title}}<br>
-	ID	{{i.id}}<br>
-	user id??????	{{i.users__id}}<br>
+{% for p in project%}
+	Name	{{p.title}}<br>
+	ID		{{p.id}}<br>
+	Workers <br>
+	{% for u in p.users.all %}
+		{{u.email}}<br>
+	{% endfor%}
 {% endfor %}
+<form id="delete" method="POST">
+{% csrf_token %}
+	<input type="submit" value="delete" name="delete" onclick="return confirm('Are you sure?')" />
+</form>
 </html>
