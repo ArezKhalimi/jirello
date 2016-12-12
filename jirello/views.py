@@ -97,15 +97,16 @@ def new_sprint(request, projectmodel_id):
     if request.method == 'POST':
         form = SprintForm(request.POST)
         form.owner = request.user.id
+        
         if form.is_valid:
             f = form.save(commit=False)
             f.owner = request.user
-            f.projects = ProjectModel.objects.get_object_or_404(
-                pk=projectmodel_id)
+            #import pdb; pdb.set_trace()
+            f.projects = ProjectModel.objects.get(pk=projectmodel_id)
             f.save()
             # how to redirect to some project? : jirllo/projects/id_project
             return HtStpResponseRedirect('/jirello/projects')
-    context_dict = {'form': form, }
+    context_dict = {'form': form, 'project_id': projectmodel_id, }
     return render(request, 'jirello/new_sprint.html', context_dict)
 
 
@@ -120,5 +121,6 @@ def projects_detail(request, projectmodel_id):
 
     if request.POST.get('delete'):
         project.delete()
+    elif request.POST.get('edit'):
         return HttpResponseRedirect('/jirello/projects')
     return render(request, 'jirello/project_detail.html', context_dict)
