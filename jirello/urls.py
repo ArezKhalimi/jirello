@@ -12,4 +12,7 @@ urlpatterns = (
     url(r'^projects/(?P<projectmodel_id>[0-9]+)/$',
         views.projects_detail,
         name='projects_detail'),
+    url(r'^projects/(?P<projectmodel_id>[0-9]+)/new_sprint/$',
+        views.new_sprint,
+        name='new_sprint'),
 )

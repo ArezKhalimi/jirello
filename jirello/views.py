@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from jirello.models import User, Task, Sprint, ProjectModel
-from jirello.forms import RegistrationForm, AuthenticationForm, ProjectForm
+from jirello.forms import RegistrationForm, AuthenticationForm, ProjectForm, SprintForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 
@@ -84,6 +84,7 @@ def new_project(request):
     form = ProjectForm()
     if request.method == 'POST':
         form = ProjectForm(request.POST)
+        # if request.POST.get('edit'): form = ProjectForm(instance(ProjectModel.object.get(pk)))
         if form.is_valid:
             form.save()
             return HttpResponseRedirect('/jirello/projects')
@@ -91,10 +92,33 @@ def new_project(request):
     return render(request, 'jirello/new_project.html', context_dict)
 
 
+def new_sprint(request, projectmodel_id):
+    form = SprintForm
+    if request.method == 'POST':
+        form = SprintForm(request.POST)
+        form.owner = request.user.id
+        if form.is_valid:
+            f = form.save(commit=False)
+            f.owner = request.user
+            f.projects = ProjectModel.objects.get_object_or_404(
+                pk=projectmodel_id)
+            f.save()
+            # how to redirect to some project? : jirllo/projects/id_project
+            return HtStpResponseRedirect('/jirello/projects')
+    context_dict = {'form': form, }
+    return render(request, 'jirello/new_sprint.html', context_dict)
+
+
 def projects_detail(request, projectmodel_id):
-    exist = get_object_or_404(ProjectModel, pk=projectmodel_id)
-    project = ProjectModel.objects.filter(pk=projectmodel_id).prefetch_related('users')
+    # 404 error if project does not exist
+    get_object_or_404(ProjectModel, pk=projectmodel_id)
+    project = ProjectModel.objects.filter(
+        pk=projectmodel_id).prefetch_related('users')
+    sprints = Sprint.objects.filter(
+        projects=projectmodel_id).order_by('date_end')
+    context_dict = {'project': project, 'sprints': sprints}
+
     if request.POST.get('delete'):
         project.delete()
         return HttpResponseRedirect('/jirello/projects')
-    return render(request, 'jirello/project_detail.html', {'project':project})
+    return render(request, 'jirello/project_detail.html', context_dict)
