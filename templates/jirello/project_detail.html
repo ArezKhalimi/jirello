@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 	<body>
-<h1> hello world!</h1>
 {% for p in project%}
-	Name	{{p.title}}<br>
+	<h1>Project	{{p.title}}</h1>
 	ID		{{p.id}}<br>
-	<a href="{% url 'new_sprint' p.id %}">TEST Create a new Sprint</a><br>
+	<a href="{% url 'edit_project' p.id %}">Edit project</a><br>
+	<a href="{% url 'new_sprint' p.id %}">Create a new Sprint</a><br>
 	Workers <br>
 	{% for u in p.users.all %}
 		{{u.email}}<br>

@@ -84,12 +84,23 @@ def new_project(request):
     form = ProjectForm()
     if request.method == 'POST':
         form = ProjectForm(request.POST)
-        # if request.POST.get('edit'): form = ProjectForm(instance(ProjectModel.object.get(pk)))
         if form.is_valid:
             form.save()
             return HttpResponseRedirect('/jirello/projects')
     context_dict = {'form': form, }
     return render(request, 'jirello/new_project.html', context_dict)
+
+
+def edit_project(request, projectmodel_id):
+    p = ProjectModel.objects.get(pk=projectmodel_id)
+    form = ProjectForm(instance=p)
+    if request.method == 'POST':
+        form = ProjectForm(request.POST or None, instance=p)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/jirello/projects')
+    # Using a new_project template
+    return render(request, 'jirello/new_project.html', {'form': form})
 
 
 def new_sprint(request, projectmodel_id):
@@ -102,9 +113,8 @@ def new_sprint(request, projectmodel_id):
             f.owner = request.user
             f.project_id = projectmodel_id
             f.save()
-            # error with no active sprint( make auto active function)
-            # how to redirect to some project? : jirllo/projects/id_project
-            return HttpResponseRedirect('/jirello/projects')
+            # how to redirect to new saved project???
+            return HttpResponseRedirect('/jirello/projects/')
     context_dict = {'form': form, 'project_id': projectmodel_id, }
     return render(request, 'jirello/new_sprint.html', context_dict)
 

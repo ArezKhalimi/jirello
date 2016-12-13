@@ -15,6 +15,7 @@ urlpatterns = patterns(
         include(patterns(
             '',
             url(r'^$', views.projects_detail, name='project_detail'),
+            url(r'^edit_project/$', views.edit_project, name='edit_project'),
             url(r'^new_sprint/$', views.new_sprint, name='new_sprint')))
         ),
 )
