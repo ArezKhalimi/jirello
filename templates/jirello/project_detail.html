@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<body>
+<h1> hello world!</h1>
+{% for p in project%}
+	Name	{{p.title}}<br>
+	ID		{{p.id}}<br>
+	<a href="{% url 'new_sprint' p.id %}">TEST Create a new Sprint</a><br>
+	Workers <br>
+	{% for u in p.users.all %}
+		{{u.email}}<br>
+	{% endfor%}
+{% endfor %}
+The list of project sprints:<br><b>
+{% for s in sprints %}
+	{{s.title}}
+{% endfor %}</b>
+<form id="delete" method="POST">
+{% csrf_token %}
+	<input type="submit" value="delete" name="delete" onclick="return confirm('Are you sure?')" />
+</form>
+</html>

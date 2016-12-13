@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
                 ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
-                ('picture', models.ImageField(upload_to=b'/profile_images', blank=True)),
+                ('picture', models.ImageField(upload_to=b'user_profile_images', blank=True)),
                 ('groups', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Group', blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', verbose_name='groups')),
                 ('user_permissions', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Permission', blank=True, help_text='Specific permissions for this user.', verbose_name='user permissions')),
             ],
@@ -51,14 +51,24 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='ProjectModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('title', models.CharField(max_length=128)),
+                ('description', models.TextField()),
+                ('users', models.ManyToManyField(related_name='projects', to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
             name='Sprint',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('title', models.CharField(unique=True, max_length=128)),
                 ('date_start', models.DateTimeField()),
                 ('date_end', models.DateTimeField()),
-                ('is_active', models.BooleanField()),
+                ('is_active', models.BooleanField(default=True)),
                 ('owner', models.ForeignKey(related_name='created_sprints', to=settings.AUTH_USER_MODEL)),
+                ('project', models.ForeignKey(related_name='sprints', to='jirello.ProjectModel')),
             ],
         ),
         migrations.CreateModel(

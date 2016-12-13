@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+	<body>
+<h1> Well here we go again!</h1>
+{% if projects_list%}
+	{% for pj in projects_list %}
+    	<a href="{% url 'projects' %}{{ pj.id }}">* {{pj.title}}<br></a>
+	{% endfor %}
+{% else %}
+	<strong>You do not have any projects.</strong><br>
+{% endif %}
+ 	<a href="{% url 'new_project' %}">Create a new project</a><br>
+ 	{% if not user.is_authenticated %}
+    <a href="{% url 'login' %}">login</a>
+    {% elif user.is_authenticated %}
+    <a href="{% url 'logout' %}">logout</a>
+    {% endif %}
+</html>

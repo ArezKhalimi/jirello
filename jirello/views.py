@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from jirello.models import User, Task, Sprint, ProjectModel
-from jirello.forms import RegistrationForm, AuthenticationForm, ProjectForm
+from jirello.forms import RegistrationForm, AuthenticationForm, ProjectForm, SprintForm
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate as auth_authenticate
@@ -70,18 +71,55 @@ def password_change(request):
 
 @login_required(login_url='/jirello/login/')
 def projects(request):
-    form = ProjectForm()
-    # import pdb; pdb.set_trace()
     if ProjectModel.objects.filter(users__id=request.user.id).exists():
-        print('ALL IN')
         projects_list = ProjectModel.objects.filter(users__id=request.user.id)
     else:
-        print('FAIL')
-        projects_list = 'sory you are have not any projects'
+        projects_list = None
+
+    context_dict = {'projects_list': projects_list}
+    return render(request, 'jirello/projects.html', context_dict)
+
+
+def new_project(request):
+    form = ProjectForm()
     if request.method == 'POST':
         form = ProjectForm(request.POST)
+        # if request.POST.get('edit'): form = ProjectForm(instance(ProjectModel.object.get(pk)))
         if form.is_valid:
             form.save()
+            return HttpResponseRedirect('/jirello/projects')
+    context_dict = {'form': form, }
+    return render(request, 'jirello/new_project.html', context_dict)
 
-    context_dict = {'form' : form, 'projects_list' : projects_list}
-    return render(request, 'jirello/project_page.html', context_dict)
+
+def new_sprint(request, projectmodel_id):
+    form = SprintForm
+    if request.method == 'POST':
+        form = SprintForm(request.POST)
+        form.owner = request.user.id
+        if form.is_valid:
+            f = form.save(commit=False)
+            f.owner = request.user
+            f.project_id = projectmodel_id
+            f.save()
+            # error with no active sprint( make auto active function)
+            # how to redirect to some project? : jirllo/projects/id_project
+            return HttpResponseRedirect('/jirello/projects')
+    context_dict = {'form': form, 'project_id': projectmodel_id, }
+    return render(request, 'jirello/new_sprint.html', context_dict)
+
+
+def projects_detail(request, projectmodel_id):
+    # 404 error if project does not exist
+    get_object_or_404(ProjectModel, pk=projectmodel_id)
+    project = ProjectModel.objects.filter(
+        pk=projectmodel_id).prefetch_related('users')
+    sprints = Sprint.objects.filter(
+        project_id=projectmodel_id).order_by('date_end')
+    context_dict = {'project': project, 'sprints': sprints}
+
+    if request.POST.get('delete'):
+        project.delete()
+    elif request.POST.get('edit'):
+        return HttpResponseRedirect('/jirello/projects')
+    return render(request, 'jirello/project_detail.html', context_dict)
