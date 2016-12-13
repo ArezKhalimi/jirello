@@ -92,16 +92,14 @@ def new_project(request):
 
 
 def edit_project(request, projectmodel_id):
-    p = ProjectModel.objects.get_object_or_404(pk=projectmodel_id)
+    p = ProjectModel.objects.get(pk=projectmodel_id)
     form = ProjectForm(instance=p)
     if request.method == 'POST':
         form = ProjectForm(request.POST or None, instance=p)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/jirello/projects')
-    # Using a new_project template
-    # Bug with create new object
-    return render(request, 'jirello/new_project.html', {'form': form})
+    return render(request, 'jirello/edit_project.html', {'form': form})
 
 
 def new_sprint(request, projectmodel_id):
@@ -143,6 +141,5 @@ def projects_detail(request, projectmodel_id):
 
     if request.POST.get('delete'):
         project.delete()
-    elif request.POST.get('edit'):
         return HttpResponseRedirect('/jirello/projects')
     return render(request, 'jirello/project_detail.html', context_dict)
