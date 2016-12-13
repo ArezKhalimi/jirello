@@ -1,7 +1,7 @@
 from django import forms
 from jirello.models.user_model import User
 from jirello.models.project_model import ProjectModel
-from jirello.models.project_model import Sprint
+from jirello.models.sprint_model import Sprint
 
 
 class RegistrationForm(forms.ModelForm):
@@ -62,19 +62,6 @@ class SprintForm(forms.ModelForm):
         widget=forms.widgets.DateInput(format="%d/%m/%Y"))
     is_active = forms.BooleanField()
 
-    # def __init__(self, *args, **kwargs):
-    #    self.request = kwargs.pop('request', None)
-    #    return super(SprintForm, self).__init__(*args, **kwargs)
-
-    # def save(self, *args, **kwargs):
-    #     kwargs['commit'] = False
-    #     obj = super(SprintForm, self).save(*args, **kwargs)
-    #     if self.request:
-    #         obj.owner = self.request.user
-    #     obj.save()
-    #     return obj
-
     class Meta:
         model = Sprint
-        #exclude = ('owner', )
         fields = ('title', 'date_start', 'date_end', 'is_active')

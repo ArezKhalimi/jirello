@@ -97,15 +97,14 @@ def new_sprint(request, projectmodel_id):
     if request.method == 'POST':
         form = SprintForm(request.POST)
         form.owner = request.user.id
-        
         if form.is_valid:
             f = form.save(commit=False)
             f.owner = request.user
-            #import pdb; pdb.set_trace()
-            f.projects = ProjectModel.objects.get(pk=projectmodel_id)
+            f.project_id = projectmodel_id
             f.save()
+            # error with no active sprint( make auto active function)
             # how to redirect to some project? : jirllo/projects/id_project
-            return HtStpResponseRedirect('/jirello/projects')
+            return HttpResponseRedirect('/jirello/projects')
     context_dict = {'form': form, 'project_id': projectmodel_id, }
     return render(request, 'jirello/new_sprint.html', context_dict)
 
@@ -116,7 +115,7 @@ def projects_detail(request, projectmodel_id):
     project = ProjectModel.objects.filter(
         pk=projectmodel_id).prefetch_related('users')
     sprints = Sprint.objects.filter(
-        projects=projectmodel_id).order_by('date_end')
+        project_id=projectmodel_id).order_by('date_end')
     context_dict = {'project': project, 'sprints': sprints}
 
     if request.POST.get('delete'):

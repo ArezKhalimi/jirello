@@ -7,13 +7,13 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('jirello', '0004_auto_20161208_1628'),
+        ('jirello', '0001_initial'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='projectmodel',
-            name='sprints',
-            field=models.ForeignKey(related_name='projects', to='jirello.Sprint', null=True),
+            model_name='user',
+            name='picture',
+            field=models.ImageField(null=True, upload_to=b'user_profile_images', blank=True),
         ),
     ]
