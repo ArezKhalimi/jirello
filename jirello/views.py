@@ -3,6 +3,7 @@ from jirello.models import User, Task, Sprint, ProjectModel
 from jirello.forms import RegistrationForm, AuthenticationForm, ProjectForm, SprintForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.core.urlresolvers import reverse
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate as auth_authenticate
@@ -113,12 +114,12 @@ def new_sprint(request, projectmodel_id):
             f.project_id = projectmodel_id
             f.save()
             # how to redirect to new saved project???
-            return HttpResponseRedirect('/jirello/projects/')
+            return HttpResponseRedirect(reverse('project_detail', args=[projectmodel_id, ]))
     context_dict = {'form': form, 'project_id': projectmodel_id, }
     return render(request, 'jirello/new_sprint.html', context_dict)
 
 
-def edit_sprint(request, projectmodel_id):
+def edit_sprint(request, projectmodel_id, sprint_id):
     pass
 
 
@@ -134,9 +135,9 @@ def projects_detail(request, projectmodel_id):
     # 404 error if project does not exist
     get_object_or_404(ProjectModel, pk=projectmodel_id)
     project = ProjectModel.objects.filter(
-        pk=projectmodel_id).prefetch_related('users')
+        pk=projectmodel_id).prefetch_related('users', )# 'sprints__tasks'
     sprints = Sprint.objects.filter(
-        project_id=projectmodel_id).order_by('date_end')
+        project_id=projectmodel_id).order_by('date_end').prefetch_related('tasks')
     context_dict = {'project': project, 'sprints': sprints}
 
     if request.POST.get('delete'):

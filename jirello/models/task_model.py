@@ -41,4 +41,4 @@ class Task(models.Model):
     # parent = models.ForeignKey(to=Task, related_name='children')
 
     def __unicode__(self):
-        return self.username
+        return self.title

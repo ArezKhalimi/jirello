@@ -14,9 +14,16 @@
 The list of project sprints:<br><b>
 {% for s in sprints %}
 	{{s.title}}
+	</b><h4>task</h4>
+	{% for t in s.tasks.all %}
+			<i>{{t.title}}<br></i>
+			
+	{% endfor %}
+	<b>
 {% endfor %}</b>
 <form id="delete" method="POST">
 {% csrf_token %}
 	<input type="submit" value="delete" name="delete" onclick="return confirm('Are you sure?')" />
 </form>
+</body>
 </html>
