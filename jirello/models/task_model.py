@@ -23,6 +23,11 @@ class Task(models.Model):
         (7, '21'),
     )
 
+    # KIND =
+    # ...,
+    # ...,
+    
+
     status = models.CharField(max_length=2,
                               null=True,
                               choices=STATUSES,

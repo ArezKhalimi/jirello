@@ -4,7 +4,7 @@
 <h1> Well here we go again!</h1>
 {% if projects_list%}
 	{% for pj in projects_list %}
-    	<a href="{% url 'projects' %}{{ pj.id }}">* {{pj.title}}<br></a>
+    	<a href="{% url 'project_detail' projectmodel_id=pj.id %}">* {{pj.title}}<br></a>
 	{% endfor %}
 {% else %}
 	<strong>You do not have any projects.</strong><br>

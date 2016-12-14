@@ -100,7 +100,7 @@ def edit_project(request, projectmodel_id):
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/jirello/projects')
-    return render(request, 'jirello/edit_project.html', {'form': form})
+    return render(request, 'jirello/edit.html', {'form': form})
 
 
 def new_sprint(request, projectmodel_id):
@@ -114,13 +114,23 @@ def new_sprint(request, projectmodel_id):
             f.project_id = projectmodel_id
             f.save()
             # how to redirect to new saved project???
-            return HttpResponseRedirect(reverse('project_detail', args=[projectmodel_id, ]))
+            return HttpResponseRedirect(reverse(
+                'project_detail', args=[projectmodel_id, ]))
     context_dict = {'form': form, 'project_id': projectmodel_id, }
     return render(request, 'jirello/new_sprint.html', context_dict)
 
 
 def edit_sprint(request, projectmodel_id, sprint_id):
-    pass
+    print('holla')
+    s = Sprint.objects.get(pk=sprint_id)
+    form = SprintForm(instance=s)
+    if request.method == 'POST':
+        form = SprintForm(request.POST or None, instance=s)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse(
+                'sprint_detail', args=[projectmodel_id, sprint_id]))
+    return render(request, 'jirello/edit.html', {'form': form})
 
 
 def new_task(request):
@@ -131,11 +141,12 @@ def edit_task(request):
     pass
 
 
-def projects_detail(request, projectmodel_id):
+def project_detail(request, projectmodel_id):
     # 404 error if project does not exist
     get_object_or_404(ProjectModel, pk=projectmodel_id)
     project = ProjectModel.objects.filter(
-        pk=projectmodel_id).prefetch_related('users', )# 'sprints__tasks'
+        pk=projectmodel_id).prefetch_related('users', )
+    # 'sprints__tasks'
     sprints = Sprint.objects.filter(
         project_id=projectmodel_id).order_by('date_end').prefetch_related('tasks')
     context_dict = {'project': project, 'sprints': sprints}
@@ -144,3 +155,14 @@ def projects_detail(request, projectmodel_id):
         project.delete()
         return HttpResponseRedirect('/jirello/projects')
     return render(request, 'jirello/project_detail.html', context_dict)
+
+
+def sprint_detail(request, projectmodel_id, sprint_id):
+    sprint = Sprint.objects.get(pk=sprint_id)
+    context_dict = {'sprint': sprint, }
+
+    if request.POST.get('delete'):
+        sprint.delete()
+        return HttpResponseRedirect(
+            reverse('project_detail', args=[projectmodel_id, ]))
+    return render(request, 'jirello/sprint_detail.html', context_dict)
