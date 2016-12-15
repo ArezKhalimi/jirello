@@ -2,6 +2,8 @@ from django import forms
 from jirello.models.user_model import User
 from jirello.models.project_model import ProjectModel
 from jirello.models.sprint_model import Sprint
+from jirello.models.task_model import Task
+from jirello.models.task_model import STATUSES, STORYPOINTS
 
 
 class RegistrationForm(forms.ModelForm):
@@ -65,3 +67,24 @@ class SprintForm(forms.ModelForm):
     class Meta:
         model = Sprint
         fields = ('title', 'date_start', 'date_end', 'is_active')
+
+
+class TaskForm(forms.ModelForm):
+
+    status = forms.ChoiceField(choices=STATUSES)
+
+    title = forms.CharField(max_length=128)
+    description = forms.CharField(widget=forms.Textarea)
+    original_estimate = forms.IntegerField()
+    remaining_estimate = forms.IntegerField()
+    storypoints = forms.ChoiceField(choices=STORYPOINTS)
+
+    class Meta:
+        model = Task
+        fields = ('title',
+                  'description',
+                  'original_estimate',
+                  'remaining_estimate',
+                  'storypoints',
+                  'worker',
+                  'sprints')

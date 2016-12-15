@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<body>
-	<a href="{% url 'edit_sprint' projectmodel_id=8 sprint_id=sprint.id %}">Edit sprint</a><br>
+	<a href="{% url 'edit_sprint' projectmodel_id=projectmodel_id sprint_id=sprint.id %}">Edit sprint</a><br>
 	<h1>ID{{sprint.id}}</h1>
 <br>title  {{sprint.title}}
 <br>date_start = {{sprint.date_start}}

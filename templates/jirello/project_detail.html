@@ -6,6 +6,7 @@
 	ID		{{p.id}}<br>
 	<a href="{% url 'edit_project' p.id %}">Edit project</a><br>
 	<a href="{% url 'new_sprint' p.id %}">Create a new Sprint</a><br>
+	<a href="{% url 'new_task' p.id %}">Make a new Task</a><br>
 	Workers <br>
 	{% for u in p.users.all %}
 		{{u.email}}<br>
