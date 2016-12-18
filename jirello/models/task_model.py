@@ -1,6 +1,8 @@
 from django.db import models
 from .user_model import User
 from .sprint_model import Sprint
+from django.core.exceptions import ValidationError
+
 
 STATUSES = (
     (u'O', u'Open'),
@@ -33,6 +35,7 @@ KIND = (
 
 
 class Task(models.Model):
+    kind = models.CharField(max_length=2, choices=KIND, default='T')
     status = models.CharField(max_length=2,
                               null=True,
                               choices=STATUSES,
@@ -44,11 +47,29 @@ class Task(models.Model):
     storypoints = models.PositiveSmallIntegerField(null=True,
                                                    choices=STORYPOINTS,
                                                    default=0)
-    # m2m field ???
+
+    project = models.ForeignKey('jirello.ProjectModel', related_name='tasks')
     worker = models.ManyToManyField(to=User, related_name='tasks')
-    sprints = models.ManyToManyField(to=Sprint, related_name='tasks')
+    sprints = models.ManyToManyField(to=Sprint, related_name='tasks',blank=True)
     owner = models.ForeignKey(to=User, related_name='created_tasks')
-    # parent = models.ForeignKey(to=Task, related_name='children')
+    parent = models.ForeignKey(
+        to='self', related_name='children', blank=True, null=True
+    )
 
     def __unicode__(self):
-        return self.title
+        return '{}: {}'.format(self.kind, self.title)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(Task, self).save(*args, **kwargs)
+
+    def clean(self):
+        # if self.project is None:
+        #     import pdb; pdb.set_trace()
+        #     raise ValidationError('Task must be in project')
+        if self.kind == 'E' and self.parent is not None:
+            raise ValidationError('Epics can`t have any parent tasks!')
+        if self.kind in ['S', 'T', 'B'] and self.parent and self.parent.kind != 'E':
+            raise ValidationError('Story must be able to Epic!')
+        if self.kind in ['t', 'b'] and self.parent and self.parent.kind != 'S':
+            raise ValidationError('StoryBug or Subtask inherist just for Story')

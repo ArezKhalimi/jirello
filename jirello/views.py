@@ -137,16 +137,11 @@ def new_task(request, projectmodel_id):
         projects__id=projectmodel_id).prefetch_related('projects')
     form.fields["sprints"].queryset = Sprint.objects.filter(
         project_id=projectmodel_id).order_by('date_end')
+    form.fields["parent"].queryset = Task.objects.filter(project_id=projectmodel_id)
     if request.method == 'POST':
-        form = TaskForm(request.POST)
-        form.owner = request.user.id
-        if form.is_valid:
-            f = form.save(commit=False)
-            f.owner = request.user
-            f.project_id = projectmodel_id
-            # for save m2m field save must be commit=True
-            f = form.save(commit=True)
-            f.save()
+        form = TaskForm(request.POST, user=request.user, project=projectmodel_id)
+        if form.is_valid():
+            form.save()
             return HttpResponseRedirect(reverse(
                 'project_detail', args=[projectmodel_id, ]))
     context_dict = {'form': form, 'project_id': projectmodel_id, }

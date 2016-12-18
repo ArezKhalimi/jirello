@@ -71,6 +71,13 @@ class SprintForm(forms.ModelForm):
 
 class TaskForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        self.project = kwargs.pop('project', None)
+        if self.project:
+            self.project = ProjectModel.objects.get(id=self.project)
+        super(TaskForm, self).__init__(*args, **kwargs)
+
     status = forms.ChoiceField(choices=STATUSES)
 
     title = forms.CharField(max_length=128)
@@ -78,6 +85,13 @@ class TaskForm(forms.ModelForm):
     original_estimate = forms.IntegerField()
     remaining_estimate = forms.IntegerField()
     storypoints = forms.ChoiceField(choices=STORYPOINTS)
+
+    def save(self, *args, **kwargs):
+        task = super(TaskForm, self).save(commit=False)
+        task.owner = self.user
+        task.project = self.project
+        task.save()
+        self.save_m2m()
 
     class Meta:
         model = Task
@@ -87,4 +101,6 @@ class TaskForm(forms.ModelForm):
                   'remaining_estimate',
                   'storypoints',
                   'worker',
-                  'sprints')
+                  'sprints',
+                  'parent',
+                  'kind')
