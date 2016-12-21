@@ -9,6 +9,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate as auth_authenticate
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
+from guardian.decorators import permission_required_or_403
+from guardian.shortcuts import assign_perm
+
 
 
 def register(request):
@@ -87,6 +90,9 @@ def new_project(request):
         form = ProjectForm(request.POST)
         if form.is_valid:
             form.save()
+            # assign permissions for each user in cleaned data
+            for u in form.cleaned_data['users']:
+                assign_perm('view_project', u, form.instance)
             return HttpResponseRedirect('/jirello/projects')
     context_dict = {'form': form, }
     return render(request, 'jirello/new_project.html', context_dict)
@@ -137,9 +143,11 @@ def new_task(request, projectmodel_id):
         projects__id=projectmodel_id).prefetch_related('projects')
     form.fields["sprints"].queryset = Sprint.objects.filter(
         project_id=projectmodel_id).order_by('date_end')
-    form.fields["parent"].queryset = Task.objects.filter(project_id=projectmodel_id)
+    form.fields["parent"].queryset = Task.objects.filter(
+        project_id=projectmodel_id)
     if request.method == 'POST':
-        form = TaskForm(request.POST, user=request.user, project=projectmodel_id)
+        form = TaskForm(request.POST, user=request.user,
+                        project=projectmodel_id)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse(
@@ -152,6 +160,8 @@ def edit_task(request):
     pass
 
 
+@permission_required_or_403('view_project',
+                            (ProjectModel, 'pk', 'projectmodel_id'))
 def project_detail(request, projectmodel_id):
     # 404 error if project does not exist
     get_object_or_404(ProjectModel, pk=projectmodel_id)

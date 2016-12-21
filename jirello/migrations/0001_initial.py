@@ -84,7 +84,7 @@ class Migration(migrations.Migration):
                 ('storypoints', models.PositiveSmallIntegerField(default=0, null=True, choices=[(1, b'1'), (2, b'2'), (3, b'3'), (4, b'5'), (5, b'8'), (6, b'13'), (7, b'21')])),
                 ('owner', models.ForeignKey(related_name='created_tasks', to=settings.AUTH_USER_MODEL)),
                 ('parent', models.ForeignKey(related_name='children', blank=True, to='jirello.Task', null=True)),
-                ('project', models.ForeignKey(related_name='tasks', to='jirello.ProjectModel', null=True)),
+                ('project', models.ForeignKey(related_name='tasks', to='jirello.ProjectModel')),
                 ('sprints', models.ManyToManyField(related_name='tasks', to='jirello.Sprint', blank=True)),
                 ('worker', models.ManyToManyField(related_name='tasks', to=settings.AUTH_USER_MODEL)),
             ],

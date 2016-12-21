@@ -24,6 +24,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'debug_toolbar',
     'jirello',
+    'guardian',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -36,6 +37,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+)
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
 )
 
 ROOT_URLCONF = 'arez_pet.urls'
@@ -103,3 +109,5 @@ MEDIA_ROOT = (os.path.join(BASE_DIR, 'media'))
 MEDIA_URL = '/media/'
 MEDIAFILES_DIRS = (MEDIA_PATH)
 INTERNAL_IPS = ['127.0.0.1']
+
+GUARDIAN_TEMPLATE_403 = True
