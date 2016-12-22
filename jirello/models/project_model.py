@@ -8,8 +8,13 @@ class ProjectModel(models.Model):
 
     users = models.ManyToManyField(to=User, related_name='projects')
 
+    class Meta:
+        permissions = (
+            ('view_project', 'User can watch the project'),
+        )
+
     def __unicode__(self):
-            return self.title
+        return self.title
 
 
 class ProjectModelManager(models.Manager):

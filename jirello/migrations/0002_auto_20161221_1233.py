@@ -11,9 +11,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='user',
-            name='picture',
-            field=models.ImageField(null=True, upload_to=b'user_profile_images', blank=True),
+        migrations.AlterModelOptions(
+            name='projectmodel',
+            options={'permissions': (('view_project', 'User can watch the project'),)},
         ),
     ]

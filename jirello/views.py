@@ -1,13 +1,17 @@
 from django.shortcuts import render
 from jirello.models import User, Task, Sprint, ProjectModel
-from jirello.forms import RegistrationForm, AuthenticationForm, ProjectForm, SprintForm
+from jirello.forms import RegistrationForm, AuthenticationForm, ProjectForm, SprintForm, TaskForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.core.urlresolvers import reverse
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate as auth_authenticate
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
+from guardian.decorators import permission_required_or_403
+from guardian.shortcuts import assign_perm
+
 
 
 def register(request):
@@ -84,42 +88,104 @@ def new_project(request):
     form = ProjectForm()
     if request.method == 'POST':
         form = ProjectForm(request.POST)
-        # if request.POST.get('edit'): form = ProjectForm(instance(ProjectModel.object.get(pk)))
         if form.is_valid:
             form.save()
+            # assign permissions for each user in cleaned data
+            for u in form.cleaned_data['users']:
+                assign_perm('view_project', u, form.instance)
             return HttpResponseRedirect('/jirello/projects')
     context_dict = {'form': form, }
     return render(request, 'jirello/new_project.html', context_dict)
+
+
+def edit_project(request, projectmodel_id):
+    p = ProjectModel.objects.get(pk=projectmodel_id)
+    form = ProjectForm(instance=p)
+    if request.method == 'POST':
+        form = ProjectForm(request.POST or None, instance=p)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/jirello/projects')
+    return render(request, 'jirello/edit.html', {'form': form})
 
 
 def new_sprint(request, projectmodel_id):
     form = SprintForm
     if request.method == 'POST':
         form = SprintForm(request.POST)
-        form.owner = request.user.id
         if form.is_valid:
             f = form.save(commit=False)
             f.owner = request.user
             f.project_id = projectmodel_id
             f.save()
-            # error with no active sprint( make auto active function)
-            # how to redirect to some project? : jirllo/projects/id_project
-            return HttpResponseRedirect('/jirello/projects')
+            return HttpResponseRedirect(reverse(
+                'project_detail', args=[projectmodel_id, ]))
     context_dict = {'form': form, 'project_id': projectmodel_id, }
     return render(request, 'jirello/new_sprint.html', context_dict)
 
 
-def projects_detail(request, projectmodel_id):
+def edit_sprint(request, projectmodel_id, sprint_id):
+    s = Sprint.objects.get(pk=sprint_id)
+    form = SprintForm(instance=s)
+    if request.method == 'POST':
+        form = SprintForm(request.POST or None, instance=s)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse(
+                'sprint_detail', args=[projectmodel_id, sprint_id]))
+    return render(request, 'jirello/edit.html', {'form': form})
+
+
+def new_task(request, projectmodel_id):
+    form = TaskForm()
+    # send to field not id or username, send list of Users
+    form.fields["worker"].queryset = User.objects.filter(
+        projects__id=projectmodel_id).prefetch_related('projects')
+    form.fields["sprints"].queryset = Sprint.objects.filter(
+        project_id=projectmodel_id).order_by('date_end')
+    form.fields["parent"].queryset = Task.objects.filter(
+        project_id=projectmodel_id)
+    if request.method == 'POST':
+        form = TaskForm(request.POST, user=request.user,
+                        project=projectmodel_id)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse(
+                'project_detail', args=[projectmodel_id, ]))
+    context_dict = {'form': form, 'project_id': projectmodel_id, }
+    return render(request, 'jirello/new_task.html', context_dict)
+
+
+def edit_task(request):
+    pass
+
+
+@permission_required_or_403('view_project',
+                            (ProjectModel, 'pk', 'projectmodel_id'))
+def project_detail(request, projectmodel_id):
     # 404 error if project does not exist
     get_object_or_404(ProjectModel, pk=projectmodel_id)
     project = ProjectModel.objects.filter(
-        pk=projectmodel_id).prefetch_related('users')
+        pk=projectmodel_id).prefetch_related('users', )
+    # 'sprints__tasks'
     sprints = Sprint.objects.filter(
-        project_id=projectmodel_id).order_by('date_end')
+        project_id=projectmodel_id).order_by('date_end').prefetch_related('tasks')
     context_dict = {'project': project, 'sprints': sprints}
 
     if request.POST.get('delete'):
         project.delete()
-    elif request.POST.get('edit'):
         return HttpResponseRedirect('/jirello/projects')
     return render(request, 'jirello/project_detail.html', context_dict)
+
+
+def sprint_detail(request, projectmodel_id, sprint_id):
+    # 404 error if project does not exist
+    get_object_or_404(Sprint, pk=sprint_id)
+    sprint = Sprint.objects.get(pk=sprint_id)
+    context_dict = {'sprint': sprint, 'projectmodel_id': projectmodel_id}
+
+    if request.POST.get('delete'):
+        sprint.delete()
+        return HttpResponseRedirect(
+            reverse('project_detail', args=[projectmodel_id, ]))
+    return render(request, 'jirello/sprint_detail.html', context_dict)

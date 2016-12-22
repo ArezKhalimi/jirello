@@ -14,7 +14,15 @@ urlpatterns = patterns(
         # ALL CURRENT PROJECT URL
         include(patterns(
             '',
-            url(r'^$', views.projects_detail, name='project_detail'),
-            url(r'^new_sprint/$', views.new_sprint, name='new_sprint')))
-        ),
+            url(r'^$', views.project_detail, name='project_detail'),
+            url(r'^edit_project/$', views.edit_project, name='edit_project'),
+            url(r'^new_task/$', views.new_task, name='new_task'),
+            url(r'^new_sprint/$', views.new_sprint, name='new_sprint'),
+            url(r'^sprint/(?P<sprint_id>[0-9]+)/$',
+                views.sprint_detail,
+                name='sprint_detail'),
+            url(r'^sprint/(?P<sprint_id>[0-9]+)/edit_sprint/$',
+                views.edit_sprint,
+                name='edit_sprint'),
+        ))),
 )
