@@ -164,8 +164,21 @@ def edit_sprint(request, projectmodel_id, sprint_id):
     return render(request, 'jirello/edit.html', {'form': form})
 
 
-def edit_task(request):
-    pass
+def edit_task(request, projectmodel_id, task_id):
+    task = Task.objects.get(pk=task_id)
+    form = TaskForm(instance=task)
+    if request.method == 'POST':
+        form = TaskForm(request.POST or None, instance=task)
+        if request.POST.get('delete'):
+            task.delete()
+            return HttpResponseRedirect(
+                reverse('project_detail', args=[projectmodel_id, ]))
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse(
+                'task_detail', args=[projectmodel_id, task_id]))
+    return render(request, 'jirello/edit.html', {'form': form})
 
 
 @permission_required_or_403('can_view',
@@ -200,6 +213,6 @@ def sprint_detail(request, projectmodel_id, sprint_id):
                             (ProjectModel, 'pk', 'projectmodel_id'))
 def task_detail(request, projectmodel_id, task_id):
     # 404 error if project does not exist
-    # get_object_or_404(Sprint, pk=sprint_id)
-    # task = Task.objects.get(pk=task_id)
-    pass
+    task = get_object_or_404(Task, pk=task_id)
+    context_dict = {'task': task, 'projectmodel_id': projectmodel_id}
+    return render(request, 'jirello/task_detail.html', context_dict)

@@ -29,7 +29,18 @@
 					{% endfor %}
 			{% endif %}
 	{% endfor %}</b>
+
+<br>
+=================================================================================================
+<br>LIST OF PROJECT TASK<br>
+	{% for t in p.tasks.all %}
+		<a href="{% url 'task_detail' projectmodel_id=p.id task_id=t.id%}">
+			<br>{{t.title}}
+		</a>
+	{% endfor %}
+
 {% endfor %}
-	
+
+
 	</body>
 </html>

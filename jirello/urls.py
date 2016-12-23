@@ -24,5 +24,11 @@ urlpatterns = patterns(
             url(r'^sprint/(?P<sprint_id>[0-9]+)/edit_sprint/$',
                 views.edit_sprint,
                 name='edit_sprint'),
+            url(r'^task/(?P<task_id>[0-9]+)/$',
+                views.task_detail,
+                name='task_detail'),
+            url(r'^task/(?P<task_id>[0-9]+)/edit_task/$',
+                views.edit_task,
+                name='edit_task'),
         ))),
 )
