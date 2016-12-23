@@ -3,29 +3,18 @@
 	<body>
 	<a href="{% url 'edit_sprint' projectmodel_id=projectmodel_id sprint_id=sprint.id %}">Edit sprint</a><br>
 	<h1>ID{{sprint.id}}</h1>
-<br>title  {{sprint.title}}
-<br>date_start = {{sprint.date_start}}
-<br>date_end = {{sprint.date_end}}
-<br>is_active = {{sprint.is_active}}
+		<br>title  {{sprint.title}}
+		<br>date_start = {{sprint.date_start}}
+		<br>date_end = {{sprint.date_end}}
+		<br>is_active = {{sprint.is_active}}
+<br><br>____TASKS____<br>
+		{% for t in tasks%}
 
-<br>owner = {{sprint.owner}}
+			<h5>{{t.title}}</h5>
 
-	<form id="delete" method="POST">
-		{% csrf_token %}
-		<input type="submit" value="delete" name="delete" onclick="return confirm('Are you sure?')" />
-	</form>
-__List_of_Tasks__
-<br>some task
-<ul>
-	<li>remove from this sprint</li>
-	<li>Task_change status</li>
-	<li>User exit from this task </li>
-</ul>
-<br>some task
-<ul>
-	<li>remove from this sprint</li>
-	<li>Task_change status</li>
-	<li>User exit from this task </li>
-</ul>
+		{% endfor %}
+
+<br>Sprint owner = {{sprint.owner}}
+
 	</body>
 </html>

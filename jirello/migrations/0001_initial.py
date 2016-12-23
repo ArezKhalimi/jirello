@@ -58,6 +58,9 @@ class Migration(migrations.Migration):
                 ('description', models.TextField()),
                 ('users', models.ManyToManyField(related_name='projects', to=settings.AUTH_USER_MODEL)),
             ],
+            options={
+                'permissions': (('can_view', 'User can watch the project'),),
+            },
         ),
         migrations.CreateModel(
             name='Sprint',
@@ -66,7 +69,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(unique=True, max_length=128)),
                 ('date_start', models.DateTimeField()),
                 ('date_end', models.DateTimeField()),
-                ('is_active', models.BooleanField(default=True)),
+                ('is_active', models.BooleanField()),
                 ('owner', models.ForeignKey(related_name='created_sprints', to=settings.AUTH_USER_MODEL)),
                 ('project', models.ForeignKey(related_name='sprints', to='jirello.ProjectModel')),
             ],

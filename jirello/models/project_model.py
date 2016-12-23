@@ -10,7 +10,7 @@ class ProjectModel(models.Model):
 
     class Meta:
         permissions = (
-            ('view_project', 'User can watch the project'),
+            ('can_view', 'User can watch the project'),
         )
 
     def __unicode__(self):

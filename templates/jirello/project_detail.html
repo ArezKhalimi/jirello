@@ -3,32 +3,33 @@
 	<body>
 {% for p in project%}
 	<h1>Project	{{p.title}}</h1>
-	ID		{{p.id}}<br>
+	ID {{p.id}}<br>
 	<a href="{% url 'edit_project' p.id %}">Edit project</a><br>
 	<a href="{% url 'new_sprint' p.id %}">Create a new Sprint</a><br>
 	<a href="{% url 'new_task' p.id %}">Make a new Task</a><br>
-	Workers <br>
+	<b>Workers: <br></b>
+
 	{% for u in p.users.all %}
 		{{u.email}}<br>
 	{% endfor%}
 
-	The list of project sprints:<br><b>
+	<b>The list of project sprints:<br></b>
+
 	{% for s in sprints %}
-		<a href="{% url 'sprint_detail' projectmodel_id=p.id sprint_id=s.id%}">{{s.title}}</a>
-		</b><h4>task</h4>
-		{% for t in s.tasks.all %}
-				<i>{{t.title}}<br></i>
-				
-		{% endfor %}
-		<b>
+		<br><a href="{% url 'sprint_detail' projectmodel_id=p.id sprint_id=s.id%}">{{s.title}}</a>
+			{% if s.is_active %}
+				Active sprint!!!
+				<ul>
+				Tasks:
+					{% for t in s.tasks.all %}
+						<ul>
+						<li>{{t.title}}</li>
+						</ul>
+				</ul> 
+					{% endfor %}
+			{% endif %}
 	{% endfor %}</b>
 {% endfor %}
-
-
-	<form id="delete" method="POST">
-		{% csrf_token %}
-		<input type="submit" value="delete" name="delete" onclick="return confirm('Are you sure?')" />
-	</form>
 	
 	</body>
 </html>

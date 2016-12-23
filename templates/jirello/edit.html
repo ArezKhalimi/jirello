@@ -8,4 +8,9 @@
 </form>
  	<a href="{% url 'projects' %}">Cancel</a>
  	</body>
+
+ 	<form id="delete" method="POST">
+		{% csrf_token %}
+		<input type="submit" value="delete" name="delete" onclick="return confirm('Are you sure?')" />
+	</form>
 </html>

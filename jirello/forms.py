@@ -62,7 +62,7 @@ class SprintForm(forms.ModelForm):
         widget=forms.widgets.DateInput(format="%d/%m/%Y"))
     date_end = forms.DateField(
         widget=forms.widgets.DateInput(format="%d/%m/%Y"))
-    is_active = forms.BooleanField()
+    is_active = forms.BooleanField(required=False, initial=False)
 
     class Meta:
         model = Sprint
