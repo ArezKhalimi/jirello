@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+	<body>
+
+<form id="form" method="POST" action="{% url 'new_sprint' project_id %}">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="submit"  />
+</form>
+ 	<a href="{% url 'projects' %}">Cancel</a>
+ 	</body>
+</html>

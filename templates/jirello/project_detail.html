@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<body>
+{% for p in project%}
+	<h1>Project	{{p.title}}</h1>
+	ID {{p.id}}<br>
+	<a href="{% url 'edit_project' p.id %}">Edit project</a><br>
+	<a href="{% url 'new_sprint' p.id %}">Create a new Sprint</a><br>
+	<a href="{% url 'new_task' p.id %}">Make a new Task</a><br>
+	<b>Workers: <br></b>
+
+	{% for u in p.users.all %}
+		{{u.email}}<br>
+	{% endfor%}
+
+	<b>The list of project sprints:<br></b>
+
+	{% for s in sprints %}
+		<br><a href="{% url 'sprint_detail' projectmodel_id=p.id sprint_id=s.id%}">{{s.title}}</a>
+			{% if s.is_active %}
+				Active sprint!!!
+				<ul>
+				Tasks:
+					{% for t in s.tasks.all %}
+						<ul>
+						<li>{{t.title}}</li>
+						</ul>			 
+					{% endfor %}
+				</ul>
+			{% endif %}
+	{% endfor %}</b>
+
+<br>
+=================================================================================================
+<br>LIST OF PROJECT TASK<br>
+	{% for t in p.tasks.all %}
+		<a href="{% url 'task_detail' projectmodel_id=p.id task_id=t.id%}">
+			<br>{{t.title}}
+		</a>
+	{% endfor %}
+
+{% endfor %}
+
+
+	</body>
+</html>

@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+	<body>
+	<a href="{% url 'edit_task' projectmodel_id=projectmodel_id task_id=task.id %}">Edit task</a><br>
+		Task: {{task.title}}<br>
+    	Kind: {{task.get_kind_display}}<br>
+    	Status: {{task.get_status_display}}<br>
+    	About: {{task.description}}<br>
+	</body>
+</html>
