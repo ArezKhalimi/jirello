@@ -93,6 +93,9 @@ def new_project(request):
             # assign permissions for each user in cleaned data
             for u in form.cleaned_data['users']:
                 assign_perm('can_view', u, form.instance)
+                # delete perm for creator
+                if u == request.user:
+                    assign_perm('delete_projectmodel', u, form.instance)
             return HttpResponseRedirect('/jirello/projects')
     context_dict = {'form': form, }
     return render(request, 'jirello/new_project.html', context_dict)
@@ -115,7 +118,7 @@ def new_sprint(request, projectmodel_id):
 
 def new_task(request, projectmodel_id):
     form = TaskForm()
-    # send to field not id or username, send list of Users
+    # query workers, sprints and parrent of project 
     form.fields["worker"].queryset = User.objects.filter(
         projects__id=projectmodel_id).prefetch_related('projects')
     form.fields["sprints"].queryset = Sprint.objects.filter(
@@ -133,6 +136,8 @@ def new_task(request, projectmodel_id):
     return render(request, 'jirello/new_task.html', context_dict)
 
 
+@permission_required_or_403('delete_projectmodel',
+                            (ProjectModel, 'pk', 'projectmodel_id'))
 def edit_project(request, projectmodel_id):
     project = ProjectModel.objects.get(pk=projectmodel_id)
     form = ProjectForm(instance=project)
@@ -152,6 +157,7 @@ def edit_sprint(request, projectmodel_id, sprint_id):
     form = SprintForm(instance=sprint)
     if request.method == 'POST':
         form = SprintForm(request.POST or None, instance=sprint)
+        # need add perm for delete ( just for project creator)has_perms
         if request.POST.get('delete'):
             sprint.delete()
             return HttpResponseRedirect(
@@ -169,6 +175,7 @@ def edit_task(request, projectmodel_id, task_id):
     form = TaskForm(instance=task)
     if request.method == 'POST':
         form = TaskForm(request.POST or None, instance=task)
+        # need add perm for delete ( just for project creator)
         if request.POST.get('delete'):
             task.delete()
             return HttpResponseRedirect(
@@ -194,7 +201,7 @@ def project_detail(request, projectmodel_id):
         raise Http404("No project matches the given query.")
     # 'sprints__tasks'
     sprints = Sprint.objects.filter(
-        project_id=projectmodel_id).order_by('date_end').prefetch_related('tasks')
+        project_id=projectmodel_id).order_by('-is_active').prefetch_related('tasks')
     context_dict = {'project': project, 'sprints': sprints}
     return render(request, 'jirello/project_detail.html', context_dict)
 
