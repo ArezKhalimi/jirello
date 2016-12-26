@@ -90,9 +90,12 @@ def new_project(request):
         form = ProjectForm(request.POST)
         if form.is_valid:
             form.save()
+            #assign_perm('can_delete','')
             # assign permissions for each user in cleaned data
             for u in form.cleaned_data['users']:
                 assign_perm('can_view', u, form.instance)
+                if u == request.user:
+                    assign_perm('delete_projectmodel', u, form.instance)
             return HttpResponseRedirect('/jirello/projects')
     context_dict = {'form': form, }
     return render(request, 'jirello/new_project.html', context_dict)
@@ -133,6 +136,8 @@ def new_task(request, projectmodel_id):
     return render(request, 'jirello/new_task.html', context_dict)
 
 
+@permission_required_or_403('delete_projectmodel',
+                            (ProjectModel, 'pk', 'projectmodel_id'))
 def edit_project(request, projectmodel_id):
     project = ProjectModel.objects.get(pk=projectmodel_id)
     form = ProjectForm(instance=project)
