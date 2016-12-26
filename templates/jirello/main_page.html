@@ -1,25 +1,32 @@
-<!DOCTYPE html>
-<html>
-	<body>
-<h1> hello world!</h1>
-{% load staticfiles %}
-{% if user.is_authenticated %}
-<h1>{{ user }}</h1>
-		{% if user.picture == '' %}
-    		<img align="right" width="150" height="150" src="/media/no_avatar.jpg/"></br>
+{% extends 'base.html' %}
+{% block title %}Jirello main page{% endblock %}
 
-		{% else %}
-    		<img align="right" width="150" height="150" src="/media/{{ user.picture }}"></br>
-		{% endif %}
-{% endif %}
+{% block header %}
+    {% if user.is_authenticated %}
+        {% if user.picture == '' %}
+            <img class="img-circle" alt="" src="/media/no_avatar.jpg/">
+        {% else %}
+            <img class="img-circle" alt="" src="/media/{{ user.picture }}">
+        {% endif %}
+    <span class="title">{{ user }}</span>
+    <span class="tagline">{{ user.email }}<br>
+    {% endif %}
+{% endblock %}
 
-<a href="{% url 'projects' %}">my projects</a>
+{% block sidebarlink %}
+<a href="{% url 'projects' %}">My Projects</a>
 <br>
+    {% if not user.is_authenticated %}
  	<a href="{% url 'register' %}">register</a>
- 	{% if not user.is_authenticated %}
     <a href="{% url 'login' %}">login</a>
     {% elif user.is_authenticated %}
     <a href="{% url 'logout' %}">logout</a>
     {% endif %}
-    </body>
-</html>
+{% endblock %}
+
+{% block maincontent%}
+
+<article class="col-sm-8 maincontent">
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet, consequuntur eius repellendus eos aliquid molestiae ea laborum ex quibusdam laudantium voluptates placeat consectetur quam aliquam beatae soluta accusantium iusto nihil nesciunt unde veniam magnam repudiandae sapiente.</p>
+</article>
+{% endblock %}
