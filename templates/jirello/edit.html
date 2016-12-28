@@ -1,5 +1,16 @@
 <!DOCTYPE html>
 <html>
+<head>
+
+{% load staticfiles %}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script rel="stylesheet" href="{% static 'jirello/js/datepicker.js' %}"></script>
+</head>
 	<body>
 <form id="form" method="POST">
     {% csrf_token %}
@@ -8,9 +19,10 @@
 </form>
  	<a href="{% url 'projects' %}">Cancel</a>
  	</body>
-
+{% if is_creator %}
  	<form id="delete" method="POST">
 		{% csrf_token %}
 		<input type="submit" value="delete" name="delete" onclick="return confirm('Are you sure?')" />
 	</form>
+{% endif %}
 </html>

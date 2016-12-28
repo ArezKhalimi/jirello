@@ -64,6 +64,8 @@ class Task(models.Model):
         return super(Task, self).save(*args, **kwargs)
 
     def clean(self):
+        import pdb; pdb.set_trace()
+
         if self.kind == 'E' and self.parent is not None:
             raise ValidationError('Epics can`t have any parent tasks!')
         if self.kind in ['S', 'T', 'B'] and self.parent and self.parent.kind != 'E':

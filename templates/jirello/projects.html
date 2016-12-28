@@ -8,27 +8,29 @@
     {% endif %}
 {% endblock %}
 
-{% block sidebarlink %}
-<a href="{% url 'new_project' %}">Create a new project</a>
-{% if projects_list%}
-	{% for pj in projects_list %}
-    	<a href="{% url 'project_detail' projectmodel_id=pj.id %}">* {{pj.title}}<br></a>
-	{% endfor %}
-{% else %}
-        <div class="row section topspace">
-            <div class="col-md-12">
-                <p class="lead text-center text-muted">You do not have any projects.</p>
+{% block maincontent%}
+<div class="col-md-4">
+    <a href="{% url 'new_project' %}" class="btn btn-primary btn-lg">Create a new project</a>
+</div>
+</div> <!-- end rod in base.html -->
+<div class="row section featured topspace">
+    <h2 class="section-title"><span>Your Projects</span></h2>
+    <div class="row">
+        {% if projects_list%}
+        	{% for pj in projects_list %}
+            <div class="col-sm-6 col-md-3">
+                <h3 class="text-center">{{pj.title}}</h3>
+                    <p>{{pj.description}}</p>
+                    <p class="text-center"><a href="{% url 'project_detail' projectmodel_id=pj.id %}" class="btn btn-action">Details</a></p>
             </div>
-        </div>
+        	{% endfor %}
+        {% else %}
+            <div class="row section topspace">
+                <div class="col-md-12">
+                    <p class="lead text-center text-muted">You do not have any projects.</p>
+                </div>
+            </div>
 {% endif %}
+    </div>
+</div>
 {% endblock %}
-
- 	<br>
- 	{% if not user.is_authenticated %}
-    <a href="{% url 'login' %}">login</a>
-    {% elif user.is_authenticated %}
-    <a href="{% url 'logout' %}">logout</a>
-    {% endif %}
-    </body>
-</html>
-

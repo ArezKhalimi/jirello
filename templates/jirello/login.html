@@ -3,14 +3,15 @@
 {% block header %}{% endblock %}
 {% block sidebarlink %}{% endblock %}
 {% block maincontent%}
-<article class="col-sm-8 maincontent">
+<article class="col-sm-4 maincontent">
     <form  method="post" action="/jirello/login/">
         {% csrf_token %}
         {{ auth_form.as_p }}
-
-        <input class="btn btn-action" type="submit" value="Login" />
+     	<div class="col-md-8 text-right">
+        	<input class="btn btn-action" type="submit" value="Login" />
+        </div>
     </form>
+</article>    
     
-    <p>Not  a member? <a href="{% url 'register' %}">Register Here!</a></p>
-</article>
+
 {% endblock %}

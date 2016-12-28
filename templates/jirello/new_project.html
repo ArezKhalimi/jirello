@@ -1,11 +1,23 @@
-<!DOCTYPE html>
-<html>
-	<body>
-<form id="form" method="POST" action="{% url 'new_project' %}">
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" value="submit"  />
-</form>
- 	<a href="{% url 'projects' %}">Cancel</a>
- 	</body>
-</html>
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+	Jirello | New Sprint
+{% endblock %}
+
+{% block header %}
+    <span class="title">New Project</span>
+    <span class="tagline">{{ user.email }}</span>
+{% endblock %}
+
+{% block maincontent%}
+<article class="col-sm-6 col-sm-offset-3">
+	<form id="form" method="POST" action="{% url 'new_project' %}">
+	    {% csrf_token %}
+	    {{form.as_p}}
+	    <div class="col-md-8 text-right">
+	    	<input type="submit" value="submit" class="btn btn-action">
+	    </div>
+	</form>
+</article>
+{% endblock %}

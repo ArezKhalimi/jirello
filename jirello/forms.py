@@ -9,12 +9,23 @@ from jirello.models.task_model import STATUSES, STORYPOINTS
 class RegistrationForm(forms.ModelForm):
     # Form for registering a new account.
     username = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'Username', }),
         error_messages={'required': 'Please enter your name'})
-    email = forms.EmailField(widget=forms.TextInput, label="Email")
-    password1 = forms.CharField(widget=forms.PasswordInput,
-                                label="Password")
-    password2 = forms.CharField(widget=forms.PasswordInput,
-                                label="Password (again)")
+    email = forms.EmailField(widget=forms.TextInput(
+        attrs={'class': 'form-control',
+               'placeholder': 'Email',
+               'id': "inputEmail"}),
+        label="Email")
+    password1 = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'form-control',
+               'placeholder': 'Password', }),
+        label="Password")
+    password2 = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'form-control',
+               'placeholder': 'Confirm Password', }),
+        label="Password (again)")
 
     class Meta:
         model = User
@@ -23,8 +34,10 @@ class RegistrationForm(forms.ModelForm):
     def clean(self):
         # Verifies that the values entered into the password fields match
         cleaned_data = super(RegistrationForm, self).clean()
-        if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
-            if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+        if 'password1' in self.cleaned_data \
+                and 'password2' in self.cleaned_data:
+            if self.cleaned_data['password1']\
+                    != self.cleaned_data['password2']:
                 raise forms.ValidationError(
                     "Passwords don't match. Please enter both fields again.")
         return self.cleaned_data
@@ -38,18 +51,32 @@ class RegistrationForm(forms.ModelForm):
 
 class AuthenticationForm(forms.Form):
     # Login form
-    username = forms.CharField(widget=forms.TextInput)
-    password = forms.CharField(widget=forms.PasswordInput)
+    username = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control',
+               'placeholder': 'Username', }))
+    password = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'form-control',
+               'placeholder': 'Password', })
+    )
 
     class Meta:
         fields = ['username', 'password']
 
 
 class ProjectForm(forms.ModelForm):
-    title = forms.CharField(max_length=100)
-    description = forms.CharField(max_length=100)
+    title = forms.CharField(max_length=100,
+                            widget=forms.TextInput(
+                                attrs={'class': 'form-control',
+                                       'placeholder': 'Project Title', }))
+    description = forms.CharField(max_length=206,
+                                  widget=forms.Textarea(
+                                      attrs={'class': 'form-control',
+                                             'placeholder': 'Description',
+                                             'rows': '4', }))
     users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(), widget=forms.CheckboxSelectMultiple())
+        # exclude AnonymousUser (special user for django-guardian)
+        queryset=User.objects.all().exclude(pk=1),
+        widget=forms.CheckboxSelectMultiple())
 
     class Meta:
         model = ProjectModel
@@ -57,11 +84,26 @@ class ProjectForm(forms.ModelForm):
 
 
 class SprintForm(forms.ModelForm):
-    title = forms.CharField(max_length=100)
+    title = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': 'Title of sprint', }))
+
     date_start = forms.DateField(
-        widget=forms.widgets.DateInput(format="%d/%m/%Y"))
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'id': 'datepicker',
+                   'placeholder': 'Sprint start date'}),
+        input_formats=['%d/%m/%Y'])
+
     date_end = forms.DateField(
-        widget=forms.widgets.DateInput(format="%d/%m/%Y"))
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'id': 'datepicker-1',
+                   'placeholder': 'Sprint end date'}),
+        input_formats=['%d/%m/%Y'])
+
     is_active = forms.BooleanField(required=False, initial=False)
 
     class Meta:

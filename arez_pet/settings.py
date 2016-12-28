@@ -44,6 +44,8 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
+LOGIN_URL = '/jirello/login/'
+
 ROOT_URLCONF = 'arez_pet.urls'
 
 
@@ -115,3 +117,5 @@ INTERNAL_IPS = ['127.0.0.1']
 GUARDIAN_RAISE_403 = True
 
 GUARDIAN_TEMPLATE_403 = True
+
+DATE_INPUT_FORMATS = ('%d-%m-%Y')

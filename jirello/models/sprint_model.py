@@ -1,6 +1,7 @@
 from django.db import models
 from .user_model import User
 from .project_model import ProjectModel
+from django.core.exceptions import ValidationError
 
 
 class Sprint(models.Model):
@@ -14,3 +15,16 @@ class Sprint(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(Sprint, self).save(*args, **kwargs)
+
+    def clean(self):
+        if self.pk is None and self.is_active:
+            raise ValidationError(
+                'You can`t create active sprint. Task does not exists!')
+        if self.pk is not None and self.is_active is True \
+                and self.project.sprints.filter(is_active=True)\
+                .exclude(pk=self.pk).exists():
+            raise ValidationError('You already have active sprint!')
