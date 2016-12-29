@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from jirello.models import User, Task, Sprint, ProjectModel
+from jirello.models import Comment
+from jirello.models.task_model import STATUSES
 from jirello.forms import RegistrationForm, AuthenticationForm
 from jirello.forms import ProjectForm, SprintForm, TaskForm
+from jirello.forms import CommentForm, StatusForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -158,6 +161,11 @@ def delete_btn(request, obj, projectmodel_id):
             reverse('project_detail', args=[projectmodel_id, ]))
 
 
+def status_change(request, task_id, status):
+    if request.method == 'POST':
+        Task.objects.filter(pk=task_id).update(status=status)
+
+
 @permission_required_or_403('can_view',
                             (ProjectModel, 'pk', 'projectmodel_id'))
 def edit_sprint(request, projectmodel_id, sprint_id):
@@ -219,8 +227,14 @@ def sprint_detail(request, projectmodel_id, sprint_id):
     # 404 error if project does not exist
     sprint = get_object_or_404(Sprint, pk=sprint_id)
     tasks = Task.objects.filter(sprints__id=sprint_id).order_by('storypoints')
+    if request.method == 'POST':
+        status_change(request,
+                      request.POST.get('task_id'),
+                      request.POST.get('status'))
     context_dict = {'sprint': sprint,
-                    'projectmodel_id': projectmodel_id, 'tasks': tasks}
+                    'projectmodel_id': projectmodel_id,
+                    'tasks': tasks,
+                    'statuses': STATUSES}
     return render(request, 'jirello/sprint_detail.html', context_dict)
 
 
@@ -229,5 +243,27 @@ def sprint_detail(request, projectmodel_id, sprint_id):
 def task_detail(request, projectmodel_id, task_id):
     # 404 error if project does not exist
     task = get_object_or_404(Task, pk=task_id)
-    context_dict = {'task': task, 'projectmodel_id': projectmodel_id}
+    comments = Comment.objects.filter(task=task_id).order_by('date_comment')
+    comment_form = CommentForm
+    if request.method == 'POST':
+        if request.POST.get('status'):
+            status_change(request,
+                          request.POST.get('task_id'),
+                          request.POST.get('status'))
+            return HttpResponseRedirect(reverse(
+                'task_detail', args=[projectmodel_id, task_id, ]))
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            f = comment_form.save(commit=False)
+            f.user = request.user
+            f.task_id = task_id
+            f.save()
+
+    context_dict = {
+        'comment_form': comment_form,
+        'task': task,
+        'projectmodel_id': projectmodel_id,
+        'comments': comments,
+        'statuses': STATUSES,
+    }
     return render(request, 'jirello/task_detail.html', context_dict)

@@ -1,12 +1,24 @@
-<!DOCTYPE html>
-<html>
-	<body>
-{% if project%}
-	<h1>Project	{{project.title}}</h1>
-	ID {{project.id}}<br>
-	<a href="{% url 'edit_project' project.id %}">Edit project</a><br>
-	<a href="{% url 'new_sprint' project.id %}">Create a new Sprint</a><br>
-	<a href="{% url 'new_task' project.id %}">Make a new Task</a><br>
+{% extends 'base.html' %}
+{% block title %}Jirello | {{ project.title }}{% endblock %}
+
+{% block header %}
+    <span class="title">{{ project.title }}</span>
+    <span class="tagline">{{ user.email }}</span>
+{% endblock %}
+
+{% block menu %}
+	<li><a href="{% url 'edit_project' project.id %}">Edit Project</a></li>
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown">Create <b class="caret"></b></a>
+		<ul class="dropdown-menu">
+			<li><a href="{% url 'new_project' %}">New Project</a></li>
+			<li><a href="{% url 'new_sprint' project.id %}">New Sprint</a></li>
+			<li><a href="{% url 'new_task' project.id %}">New Task</a></li>
+		</ul>
+	</li>
+{% endblock %}
+
+{% block maincontent%}
 	<b>Workers: <br></b>
 
 	{% for u in project.users.all %}
@@ -39,8 +51,7 @@
 		</a>
 	{% endfor %}
 
-{% endif %}
 
 
-	</body>
-</html>
+
+{% endblock %}

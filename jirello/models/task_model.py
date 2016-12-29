@@ -50,7 +50,8 @@ class Task(models.Model):
 
     project = models.ForeignKey('jirello.ProjectModel', related_name='tasks')
     worker = models.ManyToManyField(to=User, related_name='tasks')
-    sprints = models.ManyToManyField(to=Sprint, related_name='tasks',blank=True)
+    sprints = models.ManyToManyField(to=Sprint, related_name='tasks',
+                                     blank=True)
     owner = models.ForeignKey(to=User, related_name='created_tasks')
     parent = models.ForeignKey(
         to='self', related_name='children', blank=True, null=True
@@ -64,11 +65,11 @@ class Task(models.Model):
         return super(Task, self).save(*args, **kwargs)
 
     def clean(self):
-        import pdb; pdb.set_trace()
-
         if self.kind == 'E' and self.parent is not None:
             raise ValidationError('Epics can`t have any parent tasks!')
-        if self.kind in ['S', 'T', 'B'] and self.parent and self.parent.kind != 'E':
+        if self.kind in ['S', 'T', 'B'] \
+                and self.parent and self.parent.kind != 'E':
             raise ValidationError('Story must be able to Epic!')
         if self.kind in ['t', 'b'] and self.parent and self.parent.kind != 'S':
-            raise ValidationError('StoryBug or Subtask inherist just for Story')
+            raise ValidationError(
+                'StoryBug or Subtask inherist just for Story')

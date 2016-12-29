@@ -3,6 +3,8 @@ from jirello.models.user_model import User
 from jirello.models.project_model import ProjectModel
 from jirello.models.sprint_model import Sprint
 from jirello.models.task_model import Task
+from jirello.models.worklog_model import Worklog
+from jirello.models.comment_model import Comment
 from jirello.models.task_model import STATUSES, STORYPOINTS
 
 
@@ -125,24 +127,58 @@ class TaskForm(forms.ModelForm):
     title = forms.CharField(max_length=128)
     description = forms.CharField(widget=forms.Textarea)
     original_estimate = forms.IntegerField()
-    remaining_estimate = forms.IntegerField()
     storypoints = forms.ChoiceField(choices=STORYPOINTS)
 
     def save(self, *args, **kwargs):
         task = super(TaskForm, self).save(commit=False)
         task.owner = self.user
         task.project = self.project
+        if task.remaining_estimate is None \
+                or task.original_estimate < task.remaining_estimate:
+            task.remaining_estimate = task.original_estimate
         task.save()
         self.save_m2m()
 
     class Meta:
         model = Task
+        exclude = ('remaining_estimate',)
         fields = ('title',
                   'description',
                   'original_estimate',
-                  'remaining_estimate',
                   'storypoints',
                   'worker',
                   'sprints',
                   'parent',
                   'kind')
+
+
+class CommentForm(forms.ModelForm):
+    comment = forms.CharField(max_length=400,
+                              widget=forms.Textarea(
+                                  attrs={'class': 'form-control',
+                                         'rows': '6', }))
+
+    class Meta:
+        model = Comment
+        fields = (
+            'comment',
+        )
+
+
+class WorklogForm(forms.ModelForm):
+    time_spend = forms.IntegerField()
+
+    class Meta:
+        model = Worklog
+        fields = (
+            'time_spend',
+        )
+
+
+class StatusForm(forms.ModelForm):
+    status = forms.ChoiceField(choices=STATUSES)
+
+    class Meta:
+            model = Task
+            exclude = ('__all__')
+            fields = ('status',)
