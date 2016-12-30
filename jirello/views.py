@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from jirello.models import User, Task, Sprint, ProjectModel
+from jirello.models import Task, Sprint, ProjectModel
 from jirello.models import Comment
 from jirello.models.task_model import STATUSES
 from jirello.forms import RegistrationForm, AuthenticationForm
 from jirello.forms import ProjectForm, SprintForm, TaskForm
-from jirello.forms import CommentForm, StatusForm
+from jirello.forms import CommentForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -75,7 +75,8 @@ def password_change(request):
 @login_required()
 def projects(request):
     if ProjectModel.objects.filter(users__id=request.user.id).exists():
-        projects_list = ProjectModel.objects.filter(users__id=request.user.id)
+        projects_list = ProjectModel.objects \
+            .filter(users__id=request.user.id).order_by('title')
     else:
         projects_list = None
 
@@ -119,16 +120,9 @@ def new_sprint(request, projectmodel_id):
 
 @login_required()
 def new_task(request, projectmodel_id):
-    form = TaskForm()
-    # query workers, sprints and parrent of project
-    form.fields["worker"].queryset = User.objects.filter(
-        projects__id=projectmodel_id).prefetch_related('projects')
-    form.fields["sprints"].queryset = Sprint.objects.filter(
-        project_id=projectmodel_id).order_by('date_end')
-    form.fields["parent"].queryset = Task.objects.filter(
-        project_id=projectmodel_id)
+    form = TaskForm(projectmodel_id)
     if request.method == 'POST':
-        form = TaskForm(request.POST, user=request.user,
+        form = TaskForm(projectmodel_id, request.POST, user=request.user,
                         project=projectmodel_id)
         if form.is_valid():
             form.save()
@@ -190,10 +184,10 @@ def edit_sprint(request, projectmodel_id, sprint_id):
                             (ProjectModel, 'pk', 'projectmodel_id'))
 def edit_task(request, projectmodel_id, task_id):
     task = Task.objects.get(pk=task_id)
-    form = TaskForm(instance=task)
+    form = TaskForm(projectmodel_id, instance=task)
     is_creator = request.user.has_perms('projectmodel.delete_projectmodel')
     if request.method == 'POST':
-        form = TaskForm(request.POST or None, instance=task)
+        form = TaskForm(projectmodel_id, request.POST or None, instance=task)
         # need add perm for delete ( just for project creator)
         if is_creator:
             delete_btn(request, task, projectmodel_id)
@@ -216,7 +210,8 @@ def project_detail(request, projectmodel_id):
     except project.IndexError:
         raise Http404("No project matches the given query.")
     sprints = Sprint.objects.filter(
-        project_id=projectmodel_id).order_by('-is_active').prefetch_related('tasks')
+        project_id=projectmodel_id). \
+        order_by('-is_active').prefetch_related('tasks')
     context_dict = {'project': project, 'sprints': sprints}
     return render(request, 'jirello/project_detail.html', context_dict)
 

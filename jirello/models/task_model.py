@@ -48,7 +48,7 @@ class Task(models.Model):
                                                    choices=STORYPOINTS,
                                                    default=0)
 
-    project = models.ForeignKey('jirello.ProjectModel', related_name='tasks')
+    project = models.ForeignKey('jirello.ProjectModel', related_name='tasks',)
     worker = models.ManyToManyField(to=User, related_name='tasks')
     sprints = models.ManyToManyField(to=Sprint, related_name='tasks',
                                      blank=True)

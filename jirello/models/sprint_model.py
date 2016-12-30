@@ -6,8 +6,8 @@ from django.core.exceptions import ValidationError
 
 class Sprint(models.Model):
     title = models.CharField(max_length=128, unique=True)
-    date_start = models.DateTimeField()
-    date_end = models.DateTimeField()
+    date_start = models.DateField()
+    date_end = models.DateField()
     is_active = models.BooleanField(blank=True)
 
     project = models.ForeignKey(to=ProjectModel, related_name='sprints')
