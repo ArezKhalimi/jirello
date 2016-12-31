@@ -26,7 +26,8 @@
 <header id="header">
 	<div id="head" class="parallax" parallax-speed="1">
 		<h1 id="logo" class="text-center">
-			{% block header %}{% endblock %}
+			{% block header %}    <span class="title">Welcome to Jirello</span>
+    <span class="tagline">Created by Arez Khalimi</span>{% endblock %}
 		</h1>
 	</div>
 
@@ -80,6 +81,5 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 {% block scripts %}{% endblock %}
-<script src="{% static 'jirello/js/template.js' %}"></script>
 </body>
 </html>

@@ -10,6 +10,9 @@
         {% endif %}
     <span class="title">{{ user }}</span>
     <span class="tagline">{{ user.email }}</span>
+    {% else %}
+    <span class="title">Welcome to Jirello</span>
+    <span class="tagline">Created by Arez Khalimi</span>
     {% endif %}
 {% endblock %}
 
@@ -27,7 +30,44 @@
 {% block maincontent%}
 
 <article class="col-sm-8 maincontent">
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet, consequuntur eius repellendus eos aliquid molestiae ea laborum ex quibusdam laudantium voluptates placeat consectetur quam aliquam beatae soluta accusantium iusto nihil nesciunt unde veniam magnam repudiandae sapiente.</p>    
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet, consequuntur eius repellendus eos aliquid molestiae ea laborum ex quibusdam laudantium voluptates placeat consectetur quam aliquam beatae soluta accusantium iusto nihil nesciunt unde veniam magnam repudiandae sapiente.</p>
+
+                <!-- Forms HTML -->
+<div id="form-A">
+    ... html form here ....
+</div>
+<div id="form-B">
+    ... another html form here ....
+</div>
+<!-- A dropdown to select a value -->
+<select id="choose-form">
+    <option>Please choose...</option>
+    <option value="form-A">Some form</option>
+    <option value="form-B">Another form</option>
+</select>
+
+
+    
 </article>
 {% endblock %}
 
+
+
+{% block scripts %}
+<!-- Hide forms initially with Javascript (visible for non Javascript users) -->
+<script type="text/javascript">
+    $("#form-A, #form-B").hide();
+</script>
+
+<!-- and some simple jQuery -->
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#choose-form").change(function() {
+
+            //Hide -other- visible forms
+            $("#form-A, #form-B").hide();
+            $("#" + $(this).val()).show();
+        });
+    });
+</script>
+{% endblock %}

@@ -4,24 +4,25 @@
 {% block header %}
     {% if user.is_authenticated %}
     <span class="title">{{ user }}</span>
-    <span class="tagline">{{ user.email }}<br>
+    <span class="tagline">{{ user.email }}</span>
     {% endif %}
 {% endblock %}
 
 {% block maincontent%}
-<div class="col-md-4">
+<div class="row">
+<div class="col-lg-4" align="center">
     <a href="{% url 'new_project' %}" class="btn btn-primary btn-lg">Create a new project</a>
 </div>
-</div> <!-- end rod in base.html -->
+</div>
 <div class="row section featured topspace">
     <h2 class="section-title"><span>Your Projects</span></h2>
     <div class="row">
         {% if projects_list%}
-        	{% for pj in projects_list %}
+        	{% for project in projects_list %}
             <div class="col-sm-6 col-md-3">
-                <h3 class="text-center">{{pj.title}}</h3>
-                    <p>{{pj.description}}</p>
-                    <p class="text-center"><a href="{% url 'project_detail' projectmodel_id=pj.id %}" class="btn btn-action">Details</a></p>
+                <h3 class="text-center" ><a class='cross-a' href="{% url 'project_detail' projectmodel_id=project.id %}">{{project.title}}</a></h3>
+                    <p class='cross'>{{project.description}}</p>
+                    <p class="text-center"><a href="{% url 'project_detail' projectmodel_id=project.id %}" class="btn btn-action">Details</a></p>
             </div>
         	{% endfor %}
         {% else %}

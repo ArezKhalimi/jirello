@@ -209,6 +209,15 @@ a:hover {
   text-transform: capitalize;
   margin-top: -0.23em;
 }
+.cross {
+   height: 150px;
+   margin-left: 10px;
+   text-align: justify
+
+}
+.cross-a {
+  color: #333333
+}
 .size-auto,
 .size-full,
 .size-large,

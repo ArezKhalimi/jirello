@@ -145,7 +145,8 @@ def edit_project(request, projectmodel_id):
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/jirello/projects')
-    return render(request, 'jirello/edit.html', {'form': form})
+    return render(request, 'jirello/edit.html',
+                  {'form': form, 'project_id': projectmodel_id})
 
 
 def delete_btn(request, obj, projectmodel_id):
@@ -177,7 +178,9 @@ def edit_sprint(request, projectmodel_id, sprint_id):
             return HttpResponseRedirect(reverse(
                 'sprint_detail', args=[projectmodel_id, sprint_id]))
     return render(request, 'jirello/edit.html',
-                  {'form': form, 'is_creator': is_creator, })
+                  {'form': form,
+                   'is_creator': is_creator,
+                   'project_id': projectmodel_id})
 
 
 @permission_required_or_403('can_view',
@@ -197,7 +200,9 @@ def edit_task(request, projectmodel_id, task_id):
             return HttpResponseRedirect(reverse(
                 'task_detail', args=[projectmodel_id, task_id]))
     return render(request, 'jirello/edit.html',
-                  {'form': form, 'is_creator': is_creator, })
+                  {'form': form,
+                   'is_creator': is_creator,
+                   'project_id': projectmodel_id})
 
 
 @permission_required_or_403('can_view',
