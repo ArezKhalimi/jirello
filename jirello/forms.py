@@ -179,6 +179,8 @@ class SprintForm(forms.ModelForm):
             'is_active',
         ]
 
+# placeholder and help_text to template
+
 
 class TaskForm(forms.ModelForm):
 
@@ -299,10 +301,39 @@ class CommentForm(forms.ModelForm):
 
 
 class WorklogForm(forms.ModelForm):
-    time_spend = forms.IntegerField()
+    time_spend = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    time_representation = forms.CharField(max_length=10)
+    comment = forms.CharField(
+        max_length=400,
+        widget=forms.Textarea(
+            attrs={
+                'class': 'form-control',
+                'rows': '6',
+            }
+        ),
+    )
 
     class Meta:
         model = Worklog
         fields = [
+            'comment',
+            'time_representation',
             'time_spend',
         ]
+
+    def save(self, *args, **kwargs):
+        value = self.cleaned_data.pop('time_representation')
+        splitted_value = value.split(' ')
+        real_time = 0
+        for item in splitted_value:
+            if item[-1] in ['H', 'h'] and item[:-1].isdigit():
+                real_time += 3600 * int(item[:-1])
+            elif item[-1] in ['M', 'm'] and item[:-1].isdigit():
+                real_time += 60 * int(item[:-1])
+            elif item.isdigit():
+                real_time += int(item)
+            else:
+                # raise form.ValidationError('wrong input')
+                real_time = 0
+        self.cleaned_data['time_spend'] = real_time
+        return super(WorklogForm, self).save(*args, **kwargs)

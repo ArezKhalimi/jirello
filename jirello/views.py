@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from jirello.models import Task, Sprint, ProjectModel
-from jirello.models import Comment
+from jirello.models import Comment, Worklog
 from jirello.models.task_model import STATUSES
 from jirello.forms import RegistrationForm, AuthenticationForm
 from jirello.forms import ProjectForm, SprintForm, TaskForm
-from jirello.forms import CommentForm
+from jirello.forms import CommentForm, WorklogForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -161,6 +161,19 @@ def status_change(request, task_id, status):
         Task.objects.filter(pk=task_id).update(status=status)
 
 
+def save_data_form(request, form, task_id):
+    if form.is_valid():
+        f = form.save(commit=False)
+        f.user = request.user
+        f.task_id = task_id
+        #import pdb; pdb.set_trace()
+        try:
+            f.time_spend=form.cleaned_data['time_spend']
+        except:
+            pass
+        f.save()
+
+
 @permission_required_or_403('can_view',
                             (ProjectModel, 'pk', 'projectmodel_id'))
 def edit_sprint(request, projectmodel_id, sprint_id):
@@ -225,7 +238,10 @@ def project_detail(request, projectmodel_id):
                             (ProjectModel, 'pk', 'projectmodel_id'))
 def sprint_detail(request, projectmodel_id, sprint_id):
     # 404 error if project does not exist
-    sprint = get_object_or_404(Sprint, pk=sprint_id)
+    sprint = Sprint.objects.filter(pk=sprint_id)\
+        .select_related('owner', 'project').first()
+    if not sprint:
+        raise Http404('blabla')
     tasks = Task.objects.filter(sprints__id=sprint_id).order_by('storypoints')
     if request.method == 'POST':
         status_change(request,
@@ -242,9 +258,16 @@ def sprint_detail(request, projectmodel_id, sprint_id):
                             (ProjectModel, 'pk', 'projectmodel_id'))
 def task_detail(request, projectmodel_id, task_id):
     # 404 error if project does not exist
-    task = get_object_or_404(Task, pk=task_id)
-    comments = Comment.objects.filter(task=task_id).order_by('date_comment')
-    comment_form = CommentForm
+    task = Task.objects.filter(pk=task_id)\
+        .select_related('owner', 'project').prefetch_related('worker').first()
+    if not task:
+        raise Http404('blabla')
+    worklogs = Worklog.objects.filter(task=task_id).order_by(
+        '-date_comment').select_related('user')
+    comments = Comment.objects.filter(task=task_id).order_by(
+        '-date_comment').select_related('user')
+    worklog_form = WorklogForm()
+    comment_form = CommentForm()
     if request.method == 'POST':
         if request.POST.get('status'):
             status_change(request,
@@ -252,18 +275,22 @@ def task_detail(request, projectmodel_id, task_id):
                           request.POST.get('status'))
             return HttpResponseRedirect(reverse(
                 'task_detail', args=[projectmodel_id, task_id, ]))
-        comment_form = CommentForm(request.POST)
-        if comment_form.is_valid():
-            f = comment_form.save(commit=False)
-            f.user = request.user
-            f.task_id = task_id
-            f.save()
+        if 'worklog' in request.POST:
+            worklog_form = WorklogForm(request.POST)
+            save_data_form(request, worklog_form, task_id)
+            # Task.objects.filter(pk=task_id).update(remaining_estimate=(F('remaining_estimate') + 1))
+            # http://stackoverflow.com/questions/28019516/django-update-on-queryset-to-change-id-of-foreignkey
+        elif request.POST.get('comment'):
+            comment_form = CommentForm(request.POST)
+            save_data_form(request, comment_form, task_id)
 
     context_dict = {
         'comment_form': comment_form,
+        'worklog_form': worklog_form,
         'task': task,
         'projectmodel_id': projectmodel_id,
         'comments': comments,
+        'worklogs': worklogs,
         'statuses': STATUSES,
     }
     return render(request, 'jirello/task_detail.html', context_dict)

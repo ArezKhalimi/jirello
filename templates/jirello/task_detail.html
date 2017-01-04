@@ -20,7 +20,10 @@
 
 {% block maincontent%}
     <article class="post">
-		Task: {{task.title}}<br>
+        <!-- remove control for Comments/Worklogs -->
+        <button class="btn btn-choise" id='comment_btn'>Add Comment</button>
+        <button class="btn btn-choise" id='worklog_btn'>Add Worklog</button><br>
+        <!-- / -->
 		OWNER: {{task.owner}}<br>
     	Kind: {{task.get_kind_display}}<br>
     	Status: {{task.get_status_display}}<br>
@@ -45,13 +48,43 @@
     </article>
 
     <div class="col-sm-8 col-sm-offset-2">
+        <div class='form-initial'>
+        <div id="respond">
+            <h3 id="reply-title">Add Comment</h3>
+
+        <form id="comment_form" method="POST" name='comment'>
+            {% csrf_token %}
+            {{comment_form.as_p}}<br>
+            <div class="col-md-4 text-right">
+              <input type="submit" value="submit" class="btn btn-action">
+            </div>
+        </form>
+        </div>
+    </div>
+
+    <div class='form-second'>
+        <div id="respond">
+            <h3 id="reply-title">Add Worklog</h3>
+
+        <form id="worklog_form" method="POST" name='worklog'>
+            {% csrf_token %}
+            {{worklog_form.as_p}}<br>
+            <div class="col-md-4 text-right">
+              <input type="submit" value="submit" class="btn btn-action" name='worklog'>
+            </div>
+        </form>
+        </div>
+    </div>
 
         <div id="comments"> 
+<!-- Box of comments and worklogs -->
+        <!-- For Comments -->
+        <div class='form-initial'>
             <h3 class="comments-title">Comments</h3>
-                <ol class="comments-list">
+            <ol class="comments-list">
 
-    	            {% for comment in comments%}
-                    <li class="comment">
+	            {% for comment in comments%}
+                <li class="comment">
                     <div>
 
                         {% if comment.user.picture == '' %}
@@ -69,19 +102,65 @@
     		              {{comment.comment}}
                         </div>
                     </div>
-    	           {% endfor %}
-                </ol>
-    	
-        <div id="respond">
-            <h3 id="reply-title">Add Comment</h3>
+                </li>
+	           {% endfor %}
+            </ol>
+        </div>
+       <!-- For Worklogs -->
+        <div class='form-second'>
+    	   <h3 class="comments-title">Worklogs</h3>
+            <ol class="comments-list">
+                {% for worklog in worklogs%}
+                <li class="comment">
+                    <div>
 
-    	<form id="comment_form" method="POST" >
-    		{% csrf_token %}
-    		{{comment_form.as_p}}<br>
-            <div class="col-md-4 text-right">
-    		  <input type="submit" value="submit" class="btn btn-action">
-            </div>
-    	</form>
+                        {% if worklog.user.picture == '' %}
+                            <img class="avatar" alt="avatar" src="/media/no_avatar.jpg/">
+                        {% else %}
+                            <img class="avatar" alt="avatar" src="/media/{{ worklog.user.picture }}">
+                        {% endif %}
+
+                        <div class="comment-meta">
+                            <span class="author"><a href="#">{{worklog.user}}</a></span>
+                            <span class="date"><a href="#">{{worklog.date_comment}}</a></span>
+                            <span class="author"><a href="#">{{worklog.time_show}}</a></span>
+                            </div>
+
+                        <div class="comment-body">
+                          {{worklog.comment}}
+                        </div>
+                    </div>
+                </li>
+               {% endfor %}
+            </ol>
         </div>
 {% endblock %}
 
+
+{% block scripts %}
+<!-- Hide forms initially with Javascript (visible for non Javascript users) -->
+<script type="text/javascript">
+    $("#comment_btn").addClass('active');
+    $(".form-second").hide();
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    // hide the forms when page is ready
+    $('#comment_btn').click(function(){ 
+        $('#worklog_btn').removeClass('active');
+        $(this).addClass('active');
+        $('.form-initial').show();
+        $('.form-second').hide();
+        
+    });
+    $('#worklog_btn').click(function(){ 
+        $('#comment_btn').removeClass('active');
+        $(this).addClass('active');
+        $('.form-second').show();
+        $('.form-initial').hide();
+
+    });
+});
+</script>
+{% endblock %}

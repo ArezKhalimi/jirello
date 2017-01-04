@@ -26,7 +26,7 @@
 	{% endfor%}
 
 	<b>The list of project sprints:<br></b>
-
+{% if sprints%}
 	{% for s in sprints %}
 		<br><a href="{% url 'sprint_detail' projectmodel_id=project.id sprint_id=s.id%}">{{s.title}}</a>
 			{% if s.is_active %}
@@ -41,16 +41,29 @@
 				</ul>
 			{% endif %}
 	{% endfor %}</b>
-
+{% else %}
+        <div class="row section topspace">
+            <div class="col-md-12">
+                <p class="lead text-center text-muted">No Sprints in this Project.</p>
+            </div>
+        </div>
+{% endif %}
 <br>
 =================================================================================================
 <br>LIST OF PROJECT TASK<br>
+{% if project.tasks.all %}
 	{% for t in project.tasks.all %}
 		<a href="{% url 'task_detail' projectmodel_id=project.id task_id=t.id%}">
 			<br>{{t.title}}
 		</a>
 	{% endfor %}
-
+{% else %}
+    <div class="row section topspace">
+        <div class="col-md-12">
+            <p class="lead text-center text-muted">No Tasks in this Project.</p>
+        </div>
+    </div>	
+{% endif %}
 
 
 

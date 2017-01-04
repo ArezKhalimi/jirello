@@ -341,7 +341,10 @@ img {
 .btn-action.active {
   color: #bd1550;
   border-color: #bd1550;
+  text-shadow: 0 1px 0px #333;
 }
+
+
 .btn-lg {
   padding: 15px 60px;
   font-size: 12px;
