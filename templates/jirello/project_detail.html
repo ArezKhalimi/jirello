@@ -19,52 +19,67 @@
 {% endblock %}
 
 {% block maincontent%}
-	<b>Workers: <br></b>
+<div class="row section featured topspace">
+	<article class="col-sm-6 maincontent">
+		<h4 class="section-title"><span>
+			sprints:
+		</span></h4>
+	{% if sprints%}
+		<ul>
+		{% for s in sprints %}
+			<li><a class='nav-side' href="{% url 'sprint_detail' projectmodel_id=project.id sprint_id=s.id%}">{{s.title | capfirst}}</a></li>
+				{% if s.is_active %}
+					Sprint ACTIVE right now!!!<br>
+					Current tasks:
+						<ol>
+						{% for t in s.tasks.all %}
+							<a class='task-a' href="{% url 'task_detail' projectmodel_id=project.id task_id=t.id%}"><li>{{t.title | capfirst}}</li></a>			 
+						{% endfor %}
+						</ol>
+				{% endif %}
+		{% endfor %}</b>
+		</ul>
+	{% else %}
+	        <div class="row section topspace">
+	            <div class="col-md-12">
+	                <p class="lead text-center text-muted">No Sprints in this Project.</p>
+	            </div>
+	        </div>
+	{% endif %}
+	<br>
+	</article>
 
-	{% for u in project.users.all %}
-		{{u.email}}<br>
-	{% endfor%}
+	<article class="col-sm-6 maincontent">
+		<h4 class="section-title"><span>
+			tasks:
+		</span></h4>
+	{% if project.tasks.all %}
+		<ul>
+		{% for t in project.tasks.all %}
+			<li><a class='task-a nav-side' href="{% url 'task_detail' projectmodel_id=project.id task_id=t.id%}">
+				{{t.title | capfirst}}
+			</a></li>
+		{% endfor %}
+	{% else %}
+	    <div class="row section topspace">
+	        <div class="col-md-12">
+	            <p class="lead text-center text-muted">No Tasks in this Project.</p>
+	        </div>
+	    </div>	
+	{% endif %}
 
-	<b>The list of project sprints:<br></b>
-{% if sprints%}
-	{% for s in sprints %}
-		<br><a href="{% url 'sprint_detail' projectmodel_id=project.id sprint_id=s.id%}">{{s.title}}</a>
-			{% if s.is_active %}
-				Active sprint!!!
-				<ul>
-				Tasks:
-					{% for t in s.tasks.all %}
-						<ul>
-						<li>{{t.title}}</li>
-						</ul>			 
-					{% endfor %}
-				</ul>
-			{% endif %}
-	{% endfor %}</b>
-{% else %}
-        <div class="row section topspace">
-            <div class="col-md-12">
-                <p class="lead text-center text-muted">No Sprints in this Project.</p>
-            </div>
-        </div>
-{% endif %}
-<br>
-=================================================================================================
-<br>LIST OF PROJECT TASK<br>
-{% if project.tasks.all %}
-	{% for t in project.tasks.all %}
-		<a href="{% url 'task_detail' projectmodel_id=project.id task_id=t.id%}">
-			<br>{{t.title}}
-		</a>
-	{% endfor %}
-{% else %}
-    <div class="row section topspace">
-        <div class="col-md-12">
-            <p class="lead text-center text-muted">No Tasks in this Project.</p>
-        </div>
-    </div>	
-{% endif %}
+	</article>
+</div>
 
+<div class="row section featured topspace">
+	<article class="col-10 maincontent">
+		<h3>Workers:</h3>
 
+		{% for u in project.users.all %}
+			<a class='cross-a' href='#'>{{u.email}}</a>, 
+		{% endfor%}
+	</article>
+</div>
+</div>
 
 {% endblock %}

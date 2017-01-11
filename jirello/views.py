@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import F
 from jirello.models import Task, Sprint, ProjectModel
 from jirello.models import Comment, Worklog
 from jirello.models.task_model import STATUSES
@@ -6,7 +7,6 @@ from jirello.forms import RegistrationForm, AuthenticationForm
 from jirello.forms import ProjectForm, SprintForm, TaskForm
 from jirello.forms import CommentForm, WorklogForm
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.core.urlresolvers import reverse
 
@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate as auth_authenticate
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
-from guardian.decorators import permission_required_or_403
+from guardian.decorators import permission_required_or_403 as perm
 from guardian.shortcuts import assign_perm
 
 
@@ -32,9 +32,11 @@ def register(request):
             )
             auth_login(request, new_user)
             return HttpResponseRedirect("/jirello/")
-    return render(request,
-                  'jirello/register.html',
-                  {'register_form': register_form})
+    return render(
+        request,
+        'jirello/register.html',
+        {'register_form': register_form}
+    )
 
 
 def login(request):
@@ -53,7 +55,8 @@ def login(request):
         else:
             print "Invalid login details: {0}, {1}".format(username, password)
             return HttpResponse(
-                "Your username and password didn't match. Please try again.")
+                "Your username and password didn't match. Please try again."
+            )
     else:
         return render(request, 'jirello/login.html', {'auth_form': auth_form})
 
@@ -84,12 +87,39 @@ def projects(request):
     return render(request, 'jirello/projects.html', context_dict)
 
 
+def delete_btn(request, obj, projectmodel_id):
+    if request.POST.get('delete'):
+        obj.delete()
+        return HttpResponseRedirect(
+            reverse('project_detail', args=[projectmodel_id, ]))
+
+
+def status_change(request, task_id, status):
+    if request.method == 'POST':
+        Task.objects.filter(pk=task_id).update(status=status)
+
+
+def save_data_form(request, form, task_id):
+    if form.is_valid():
+        f = form.save(commit=False)
+        f.user = request.user
+        f.task_id = task_id
+        try:
+            f.time_spend = form.cleaned_data['time_spend']
+            # end of rem_est
+            Task.objects.filter(pk=task_id).update(
+                remaining_estimate=(F('remaining_estimate') - f.time_spend))
+        except:
+            pass
+        f.save()
+
+
 @login_required()
 def new_project(request):
     form = ProjectForm()
     if request.method == 'POST':
         form = ProjectForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
             form.save()
             # assign permissions for each user in cleaned data
             for u in form.cleaned_data['users']:
@@ -113,7 +143,8 @@ def new_sprint(request, projectmodel_id):
             f.project_id = projectmodel_id
             f.save()
             return HttpResponseRedirect(reverse(
-                'project_detail', args=[projectmodel_id, ]))
+                'project_detail', args=[projectmodel_id, ]
+            ))
     context_dict = {'form': form, 'project_id': projectmodel_id, }
     return render(request, 'jirello/new_sprint.html', context_dict)
 
@@ -122,60 +153,44 @@ def new_sprint(request, projectmodel_id):
 def new_task(request, projectmodel_id):
     form = TaskForm(projectmodel_id)
     if request.method == 'POST':
-        form = TaskForm(projectmodel_id, request.POST, user=request.user,
-                        project=projectmodel_id)
+        form = TaskForm(
+            projectmodel_id,
+            request.POST,
+            user=request.user,
+            project=projectmodel_id
+        )
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse(
-                'project_detail', args=[projectmodel_id, ]))
+                'project_detail', args=[projectmodel_id, ]
+            ))
     context_dict = {'form': form, 'project_id': projectmodel_id, }
     return render(request, 'jirello/new_task.html', context_dict)
 
 
-@permission_required_or_403('delete_projectmodel',
-                            (ProjectModel, 'pk', 'projectmodel_id'))
+@perm('delete_projectmodel', (ProjectModel, 'pk', 'projectmodel_id'))
 def edit_project(request, projectmodel_id):
     project = ProjectModel.objects.get(pk=projectmodel_id)
     form = ProjectForm(instance=project)
+    is_creator = request.user.has_perms('projectmodel.delete_projectmodel')
     if request.method == 'POST':
         form = ProjectForm(request.POST or None, instance=project)
-        if request.POST.get('delete'):
+        if request.POST.get('delete') and is_creator:
             project.delete()
             return HttpResponseRedirect('/jirello/projects')
         if form.is_valid():
             form.save()
             return HttpResponseRedirect('/jirello/projects')
     return render(request, 'jirello/edit.html',
-                  {'form': form, 'project_id': projectmodel_id})
+                  {
+                      'form': form,
+                      'is_creator': is_creator,
+                      'project_id': projectmodel_id,
+                  }
+                  )
 
 
-def delete_btn(request, obj, projectmodel_id):
-    if request.POST.get('delete'):
-        obj.delete()
-        return HttpResponseRedirect(
-            reverse('project_detail', args=[projectmodel_id, ]))
-
-
-def status_change(request, task_id, status):
-    if request.method == 'POST':
-        Task.objects.filter(pk=task_id).update(status=status)
-
-
-def save_data_form(request, form, task_id):
-    if form.is_valid():
-        f = form.save(commit=False)
-        f.user = request.user
-        f.task_id = task_id
-        #import pdb; pdb.set_trace()
-        try:
-            f.time_spend=form.cleaned_data['time_spend']
-        except:
-            pass
-        f.save()
-
-
-@permission_required_or_403('can_view',
-                            (ProjectModel, 'pk', 'projectmodel_id'))
+@perm('can_view', (ProjectModel, 'pk', 'projectmodel_id'))
 def edit_sprint(request, projectmodel_id, sprint_id):
     sprint = Sprint.objects.get(pk=sprint_id)
     form = SprintForm(instance=sprint)
@@ -185,19 +200,21 @@ def edit_sprint(request, projectmodel_id, sprint_id):
         # need add perm for delete ( just for project creator)has_perms
         if is_creator:
             delete_btn(request, sprint, projectmodel_id)
-
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse(
-                'sprint_detail', args=[projectmodel_id, sprint_id]))
+                'sprint_detail', args=[projectmodel_id, sprint_id]
+            ))
     return render(request, 'jirello/edit.html',
-                  {'form': form,
-                   'is_creator': is_creator,
-                   'project_id': projectmodel_id})
+                  {
+                      'form': form,
+                      'is_creator': is_creator,
+                      'project_id': projectmodel_id
+                  }
+                  )
 
 
-@permission_required_or_403('can_view',
-                            (ProjectModel, 'pk', 'projectmodel_id'))
+@perm('can_view', (ProjectModel, 'pk', 'projectmodel_id'))
 def edit_task(request, projectmodel_id, task_id):
     task = Task.objects.get(pk=task_id)
     form = TaskForm(projectmodel_id, instance=task)
@@ -213,13 +230,15 @@ def edit_task(request, projectmodel_id, task_id):
             return HttpResponseRedirect(reverse(
                 'task_detail', args=[projectmodel_id, task_id]))
     return render(request, 'jirello/edit.html',
-                  {'form': form,
-                   'is_creator': is_creator,
-                   'project_id': projectmodel_id})
+                  {
+                      'form': form,
+                      'is_creator': is_creator,
+                      'project_id': projectmodel_id
+                  }
+                  )
 
 
-@permission_required_or_403('can_view',
-                            (ProjectModel, 'pk', 'projectmodel_id'))
+@perm('can_view', (ProjectModel, 'pk', 'projectmodel_id'))
 def project_detail(request, projectmodel_id):
     # 404 error if project does not exist
     try:
@@ -234,8 +253,7 @@ def project_detail(request, projectmodel_id):
     return render(request, 'jirello/project_detail.html', context_dict)
 
 
-@permission_required_or_403('can_view',
-                            (ProjectModel, 'pk', 'projectmodel_id'))
+@perm('can_view', (ProjectModel, 'pk', 'projectmodel_id'))
 def sprint_detail(request, projectmodel_id, sprint_id):
     # 404 error if project does not exist
     sprint = Sprint.objects.filter(pk=sprint_id)\
@@ -244,18 +262,21 @@ def sprint_detail(request, projectmodel_id, sprint_id):
         raise Http404('blabla')
     tasks = Task.objects.filter(sprints__id=sprint_id).order_by('storypoints')
     if request.method == 'POST':
-        status_change(request,
-                      request.POST.get('task_id'),
-                      request.POST.get('status'))
-    context_dict = {'sprint': sprint,
-                    'projectmodel_id': projectmodel_id,
-                    'tasks': tasks,
-                    'statuses': STATUSES}
+        status_change(
+            request,
+            request.POST.get('task_id'),
+            request.POST.get('status'),
+        )
+    context_dict = {
+        'sprint': sprint,
+        'projectmodel_id': projectmodel_id,
+        'tasks': tasks,
+        'statuses': STATUSES
+    }
     return render(request, 'jirello/sprint_detail.html', context_dict)
 
 
-@permission_required_or_403('can_view',
-                            (ProjectModel, 'pk', 'projectmodel_id'))
+@perm('can_view', (ProjectModel, 'pk', 'projectmodel_id'))
 def task_detail(request, projectmodel_id, task_id):
     # 404 error if project does not exist
     task = Task.objects.filter(pk=task_id)\
@@ -278,8 +299,6 @@ def task_detail(request, projectmodel_id, task_id):
         if 'worklog' in request.POST:
             worklog_form = WorklogForm(request.POST)
             save_data_form(request, worklog_form, task_id)
-            # Task.objects.filter(pk=task_id).update(remaining_estimate=(F('remaining_estimate') + 1))
-            # http://stackoverflow.com/questions/28019516/django-update-on-queryset-to-change-id-of-foreignkey
         elif request.POST.get('comment'):
             comment_form = CommentForm(request.POST)
             save_data_form(request, comment_form, task_id)

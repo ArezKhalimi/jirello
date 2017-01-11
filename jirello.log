@@ -1,0 +1,48 @@
+2017-01-06 21:26:11,616 ProjectModel __CREATED__: tt+ss
+2017-01-06 21:35:21,481 Task __CREATED__: E: tsts
+2017-01-06 21:35:21,481 Task __DELETED__: E: tsts
+2017-01-06 21:47:34,726 Task __CREATED__: E: df
+2017-01-06 21:47:34,726 Task __DELETED__: E: df
+2017-01-06 21:48:07,666 Task __CHANGE__: E: tsts
+2017-01-06 21:48:07,666 Task __DELETED__: E: tsts
+2017-01-06 21:48:44,314 Task __CREATED__: E: Epic
+2017-01-06 21:48:44,315 Task __DELETED__: E: Epic
+2017-01-06 22:23:07,339 Sprint __CREATED__: blabla
+2017-01-06 22:23:07,340 Sprint __DELETED__: blabla
+2017-01-07 08:39:42,002 Sprint __CHANGE__: blabla
+2017-01-07 08:39:42,016 Sprint __DELETED__: blabla
+2017-01-07 09:23:30,166 Task __CREATED__: E: wood
+2017-01-07 09:23:30,167 Task __DELETED__: E: wood
+2017-01-07 09:24:03,122 Task __CREATED__: E: kid
+2017-01-07 09:24:03,123 Task __DELETED__: E: kid
+2017-01-09 08:57:42,578 Sprint __CREATED__: ababagalamaga
+2017-01-09 08:57:42,583 Sprint __DELETED__: ababagalamaga
+2017-01-09 09:41:06,171 ProjectModel __CHANGE__: max
+2017-01-09 09:41:32,670 ProjectModel __CREATED__: night
+2017-01-09 09:47:08,046 ProjectModel __DELETED__: sdasdad
+2017-01-09 09:47:15,581 ProjectModel __DELETED__: night
+2017-01-09 09:47:22,422 ProjectModel __DELETED__: max
+2017-01-09 09:47:28,533 ProjectModel __DELETED__: lo ma
+2017-01-09 10:00:39,623 Sprint __CREATED__: One
+2017-01-09 10:00:39,623 Sprint __DELETED__: One
+2017-01-09 17:28:19,507 ProjectModel __CREATED__: Захватить мир
+2017-01-09 17:28:31,456 ProjectModel __CREATED__: ыл
+2017-01-09 17:29:34,063 Sprint __CREATED__: стометровка
+2017-01-09 17:29:34,065 Sprint __DELETED__: стометровка
+2017-01-09 17:31:49,879 ProjectModel __CREATED__: lksdfhdshfoo
+2017-01-09 17:32:04,143 Sprint __CREATED__: bak
+2017-01-09 17:32:04,143 Sprint __DELETED__: bak
+2017-01-09 17:32:42,702 Task __CREATED__: E: jj
+2017-01-09 17:32:42,703 Task __DELETED__: E: jj
+2017-01-09 17:33:06,707 Sprint __CREATED__: lkfdkfd
+2017-01-09 17:33:06,708 Sprint __DELETED__: lkfdkfd
+2017-01-09 17:33:21,991 Sprint __CHANGE__: lkfdkfd
+2017-01-09 17:33:21,991 Sprint __DELETED__: lkfdkfd
+2017-01-09 17:33:48,645 Sprint __CHANGE__: lkfdkfd
+2017-01-09 17:33:48,646 Sprint __DELETED__: lkfdkfd
+2017-01-09 17:34:02,606 Sprint __CHANGE__: bak
+2017-01-09 17:34:02,607 Sprint __DELETED__: bak
+2017-01-09 17:34:31,021 Task __CHANGE__: E: jj
+2017-01-09 17:34:31,023 Task __DELETED__: E: jj
+2017-01-11 12:03:50,171 Sprint __CHANGE__: blabla
+2017-01-11 12:03:50,181 Sprint __DELETED__: blabla

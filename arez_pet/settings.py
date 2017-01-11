@@ -25,6 +25,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'jirello',
     'guardian',
+    'django.contrib.humanize',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -111,7 +112,10 @@ STATICFILES_DIRS = (
 MEDIA_PATH = os.path.join(BASE_DIR, 'media', )
 MEDIA_ROOT = (os.path.join(BASE_DIR, 'media'))
 MEDIA_URL = '/media/'
-MEDIAFILES_DIRS = (MEDIA_PATH)
+MEDIAFILES_DIRS = (
+    MEDIA_PATH,
+)
+
 INTERNAL_IPS = ['127.0.0.1']
 
 GUARDIAN_RAISE_403 = True
@@ -119,3 +123,32 @@ GUARDIAN_RAISE_403 = True
 GUARDIAN_TEMPLATE_403 = True
 
 USE_L10N = True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s %(message)s'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'jirello.log'),
+            'formatter': 'simple'},
+    },
+    'loggers': {
+        'jirello': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+# ELASTICSEARCH
+
+ELASTICSEARCH_DEFAULT_INDEX = 'jirello'
+ELASTICSEARCH_AUTO_INDEX = True

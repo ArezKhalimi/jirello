@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 {% block title %}Jirello | {{ task.title }}{% endblock %}
 
 {% block header %}
@@ -21,11 +22,15 @@
 {% block maincontent%}
     <article class="post">
         <!-- remove control for Comments/Worklogs -->
-        <button class="btn btn-choise" id='comment_btn'>Add Comment</button>
-        <button class="btn btn-choise" id='worklog_btn'>Add Worklog</button><br>
+        <button class="butcom blue" id='comment_btn'>Comments</button>
+        <button class="butcom blue" id='worklog_btn'>Worklogs</button><br>
         <!-- / -->
+         <div class="span6">
 		OWNER: {{task.owner}}<br>
+        </div>
+         <div class="span3">
     	Kind: {{task.get_kind_display}}<br>
+        </div>
     	Status: {{task.get_status_display}}<br>
                     <!-- Form for change  task status -->
             <form id="status_form" method="POST" action="{% url 'task_detail' projectmodel_id task.id %}">
@@ -44,7 +49,7 @@
             </form>
     	About: {{task.description}}<br>
     	Original: {{task.original_estimate }}<br>
-    	Remaining {{task.remaining_estimate }}<br>
+    	Remaining {{task.estimate_left }}<br>
     </article>
 
     <div class="col-sm-8 col-sm-offset-2">
@@ -95,7 +100,7 @@
 
                         <div class="comment-meta">
                             <span class="author"><a href="#">{{comment.user}}</a></span>
-                            <span class="date"><a href="#">{{comment.date_comment}}</a></span>
+                            <span class="date"><a href="#">{{comment.date_comment | naturaltime}}</a></span>
                         </div>
 
                         <div class="comment-body">
@@ -122,7 +127,7 @@
 
                         <div class="comment-meta">
                             <span class="author"><a href="#">{{worklog.user}}</a></span>
-                            <span class="date"><a href="#">{{worklog.date_comment}}</a></span>
+                            <span class="date"><a href="#">{{worklog.date_comment | naturaltime}}</a></span>
                             <span class="author"><a href="#">{{worklog.time_show}}</a></span>
                             </div>
 
@@ -134,6 +139,7 @@
                {% endfor %}
             </ol>
         </div>
+<br><br>
 {% endblock %}
 
 

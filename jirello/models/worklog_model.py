@@ -15,7 +15,6 @@ class Worklog(models.Model):
 
     @property
     def time_show(self):
-    	#return self.time_spend if time_spend < 10 else '%.1fk' % (self.time_spend/1000.0)
         return str(timedelta(seconds=self.time_spend))
 
     def __unicode__(self):

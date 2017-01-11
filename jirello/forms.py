@@ -147,23 +147,25 @@ class SprintForm(forms.ModelForm):
     )
 
     date_start = forms.DateField(
-        widget=forms.TextInput(
+        widget=forms.DateInput(
             attrs={
                 'class': 'form-control',
                 'id': 'datepicker',
                 'placeholder': 'Sprint start date',
-            }
+            },
+            format='%d/%m/%Y',
         ),
         input_formats=['%d/%m/%Y']
     )
 
     date_end = forms.DateField(
-        widget=forms.TextInput(
+        widget=forms.DateInput(
             attrs={
                 'class': 'form-control',
                 'id': 'datepicker-1',
                 'placeholder': 'Sprint end date',
-            }
+            },
+            format='%d/%m/%Y',
         ),
         input_formats=['%d/%m/%Y']
     )
@@ -222,7 +224,8 @@ class TaskForm(forms.ModelForm):
             }
         ),
     )
-    original_estimate = forms.IntegerField(
+    original_estimate = forms.CharField(
+        max_length=10,
         widget=forms.TextInput(
             attrs={'class': 'form-control',
                    'placeholder': '!!!!!!!!INSTRUCTIONS!!!!!!',
@@ -253,6 +256,22 @@ class TaskForm(forms.ModelForm):
             }
         ),
     )
+
+    def clean(self, *args, **kwargs):
+        value = self.cleaned_data.pop('original_estimate')
+        splitted_value = value.split(' ')
+        real_time = 0
+        for item in splitted_value:
+            if item[-1] in ['H', 'h'] and item[:-1].isdigit():
+                real_time += 3600 * int(item[:-1])
+            elif item[-1] in ['M', 'm'] and item[:-1].isdigit():
+                real_time += 60 * int(item[:-1])
+            elif item.isdigit():
+                real_time += int(item)
+            else:
+                raise forms.ValidationError('Wrong time input')
+        self.cleaned_data['original_estimate'] = real_time
+        return self.cleaned_data
 
     def save(self, *args, **kwargs):
         task = super(TaskForm, self).save(commit=False)
@@ -301,8 +320,14 @@ class CommentForm(forms.ModelForm):
 
 
 class WorklogForm(forms.ModelForm):
-    time_spend = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    time_representation = forms.CharField(max_length=10)
+    time_spend = forms.CharField(
+        max_length=10,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control',
+                   'placeholder': '!!!!!!!!INSTRUCTIONS!!!!!!',
+                   }
+        )
+    )
     comment = forms.CharField(
         max_length=400,
         widget=forms.Textarea(
@@ -317,12 +342,11 @@ class WorklogForm(forms.ModelForm):
         model = Worklog
         fields = [
             'comment',
-            'time_representation',
             'time_spend',
         ]
 
-    def save(self, *args, **kwargs):
-        value = self.cleaned_data.pop('time_representation')
+    def clean(self, *args, **kwargs):
+        value = self.cleaned_data.pop('time_spend')
         splitted_value = value.split(' ')
         real_time = 0
         for item in splitted_value:
@@ -333,7 +357,6 @@ class WorklogForm(forms.ModelForm):
             elif item.isdigit():
                 real_time += int(item)
             else:
-                # raise form.ValidationError('wrong input')
-                real_time = 0
+                raise forms.ValidationError('Wrong time input')
         self.cleaned_data['time_spend'] = real_time
-        return super(WorklogForm, self).save(*args, **kwargs)
+        return self.cleaned_data

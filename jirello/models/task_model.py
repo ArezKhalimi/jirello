@@ -2,6 +2,7 @@ from django.db import models
 from .user_model import User
 from .sprint_model import Sprint
 from django.core.exceptions import ValidationError
+from datetime import timedelta
 
 
 STATUSES = (
@@ -56,6 +57,10 @@ class Task(models.Model):
     parent = models.ForeignKey(
         to='self', related_name='children', blank=True, null=True
     )
+
+    @property
+    def estimate_left(self):
+        return str(timedelta(seconds=self.remaining_estimate))
 
     def __unicode__(self):
         return '{}: {}'.format(self.kind, self.title)
