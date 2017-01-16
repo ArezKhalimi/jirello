@@ -333,7 +333,7 @@ class WorklogForm(forms.ModelForm):
         widget=forms.Textarea(
             attrs={
                 'class': 'form-control',
-                'rows': '6',
+                'rows': '2',
             }
         ),
     )

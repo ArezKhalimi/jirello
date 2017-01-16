@@ -1,11 +1,12 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import secure
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'qfqu5pu38%sp$gn%d0rp0lt1-p_c6e+!7i8%z3o^o+7pr6yedp'
+SECRET_KEY = secure.secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -22,10 +23,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'haystack',
     'debug_toolbar',
     'jirello',
     'guardian',
     'django.contrib.humanize',
+    'django_celery_beat',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -75,16 +78,7 @@ WSGI_APPLICATION = 'arez_pet.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'jirello',
-        'USER': 'postgres',
-        'PASSWORD': '123',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
+DATABASES = secure.db_config
 
 
 # Internationalization
@@ -116,7 +110,7 @@ MEDIAFILES_DIRS = (
     MEDIA_PATH,
 )
 
-INTERNAL_IPS = ['127.0.0.1']
+INTERNAL_IPS = secure.internal_ips
 
 GUARDIAN_RAISE_403 = True
 
@@ -148,7 +142,31 @@ LOGGING = {
     },
 }
 
-# ELASTICSEARCH
+# HAYSTACK + ELASTICSEARCH
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+    },
+}
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
-ELASTICSEARCH_DEFAULT_INDEX = 'jirello'
-ELASTICSEARCH_AUTO_INDEX = True
+
+# REDIS + CELERY
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Kiev'
+
+# EMAIL HOST
+
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_PASSWORD = secure.host_password
+EMAIL_HOST_USER = secure.host_user
+EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

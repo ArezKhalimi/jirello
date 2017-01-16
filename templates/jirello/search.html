@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Jirello | Search {% endblock %}
+
+{% block header %}
+    <span class="title">Search</a></span>
+    <span class="tagline">find some project task</span>
+{% endblock %}
+
+{% block maincontent %}  
+<div class="row section featured topspace footspace">
+<div class="row">
+    <div class="col-md-6">
+    <h3>Search</h3>
+    <form method="get" action="." >
+        <table>
+        {{form.q}}
+            <tr>
+                <td>&nbsp;</td>
+                <td>
+                    <br><input class="btn btn-primary" type="submit" value="Search">
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h3>Results</h3>
+        {% if query %}
+
+            {% for result in object_list %}
+                <p>
+                    <a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a>
+                    {{ result.object.description }}
+                </p>
+            {% empty %}
+                <p class="lead text-muted">No results found.</p>
+            {% endfor %}
+
+        {% else %}
+            <p class="lead text-muted">Try find a project tasks</p>
+        {% endif %}
+    </form>
+    </div>
+{% endblock %}

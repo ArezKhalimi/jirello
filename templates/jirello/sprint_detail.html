@@ -58,12 +58,74 @@
 			</form>
 		</div>
 	</article>
-
 		{% endfor %}
-
+<div id="chartdiv" style="width: 100%; height: 400px; background-color: #FFFFFF;" ></div>
 {% endblock %}
 
 
+{% block scripts %}
+<script type="text/javascript" src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+<script type="text/javascript" src="https://www.amcharts.com/lib/3/serial.js"></script>
+		
 
+		<!-- amCharts javascript code -->
+		<script type="text/javascript">
+			console.log('{{ chart_sprint | escapejs }}')
+			var jsonObject = JSON.parse('{{ chart_sprint | escapejs }}')
+			var chart = AmCharts.makeChart("chartdiv",
+				{
+					"type": "serial",
+					"categoryField": "date",
+					"dataDateFormat": "YYYY-MM-DD",
+					"categoryAxis": {
+						"parseDates": true
+					},
+					"chartCursor": {
+						"enabled": true
+					},
+					"chartScrollbar": {
+						"enabled": true
+					},
+					"trendLines": [],
+					"graphs": [
+						{
+							"bullet": "round",
+							"id": "AmGraph-1",
+							"title": "original estimate",
+							"valueField": "column-1"
+						},
+						{
+							"bullet": "square",
+							"id": "AmGraph-2",
+							"title": "graph 2",
+							"valueField": "column-2"
+						}
+					],
+					"guides": [],
+					"valueAxes": [
+						{
+							"id": "ValueAxis-1",
+							"title": "Time"
+						}
+					],
+					"allLabels": [],
+					"balloon": {},
+					"legend": {
+						"enabled": true,
+						"useGraphSettings": true
+					},
+					"titles": [
+						{
+							"id": "Title-1",
+							"size": 15,
+							"text": "Sprint {{ sprint.title }} statistic"
+						}
+					],
+					"dataProvider":
+					jsonObject 
+				}
+			);
+		</script>
+{% endblock %}
 
 

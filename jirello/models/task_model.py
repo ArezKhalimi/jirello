@@ -3,7 +3,7 @@ from .user_model import User
 from .sprint_model import Sprint
 from django.core.exceptions import ValidationError
 from datetime import timedelta
-
+from django.core.urlresolvers import reverse
 
 STATUSES = (
     (u'O', u'Open'),
@@ -58,9 +58,18 @@ class Task(models.Model):
         to='self', related_name='children', blank=True, null=True
     )
 
+
     @property
-    def estimate_left(self):
+    def get_absolute_url(self):
+        return reverse('task_detail', kwargs={'projectmodel_id': self.project_id, 'task_id': self.pk })
+
+    @property
+    def estimate_time(self):
         return str(timedelta(seconds=self.remaining_estimate))
+
+    @property
+    def original_time(self):
+        return str(timedelta(seconds=self.original_estimate))
 
     def __unicode__(self):
         return '{}: {}'.format(self.kind, self.title)

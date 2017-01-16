@@ -1,5 +1,0 @@
-Django == 1.8
-Celery
-django-guardian
-redis
-postgresql

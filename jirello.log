@@ -46,3 +46,25 @@
 2017-01-09 17:34:31,023 Task __DELETED__: E: jj
 2017-01-11 12:03:50,171 Sprint __CHANGE__: blabla
 2017-01-11 12:03:50,181 Sprint __DELETED__: blabla
+2017-01-12 08:37:20,844 ProjectModel __CREATED__: just friends
+2017-01-12 08:39:46,008 ProjectModel __CREATED__: just friends1
+2017-01-12 08:40:48,636 ProjectModel __DELETED__: just friends1
+2017-01-12 08:40:56,449 ProjectModel __DELETED__: just friends
+2017-01-13 11:30:41,302 Task __CREATED__: E: 777
+2017-01-13 11:30:41,336 Task __DELETED__: E: 777
+2017-01-16 20:27:15,472 Task __CREATED__: E: 50 seconds
+2017-01-16 20:27:15,472 Task __DELETED__: E: 50 seconds
+2017-01-16 20:30:48,609 Sprint __CREATED__: Deploy
+2017-01-16 20:30:48,609 Sprint __DELETED__: Deploy
+2017-01-16 20:31:48,618 Task __CREATED__: E: 5 minutes task
+2017-01-16 20:31:48,618 Task __DELETED__: E: 5 minutes task
+2017-01-16 20:36:56,647 Sprint __CREATED__: sprint without task
+2017-01-16 20:36:56,647 Sprint __DELETED__: sprint without task
+2017-01-16 20:47:58,213 Sprint __CHANGE__: blabla
+2017-01-16 20:47:58,215 Sprint __DELETED__: blabla
+2017-01-16 20:48:38,674 Sprint __CHANGE__: blabla
+2017-01-16 20:48:38,675 Sprint __DELETED__: blabla
+2017-01-16 20:50:32,753 Task __CHANGE__: E: mill
+2017-01-16 20:50:32,753 Task __DELETED__: E: mill
+2017-01-16 20:51:02,220 Task __CHANGE__: E: kjf
+2017-01-16 20:51:02,227 Task __DELETED__: E: kjf

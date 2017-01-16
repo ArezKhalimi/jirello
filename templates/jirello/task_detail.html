@@ -20,100 +20,89 @@
 {% endblock %}
 
 {% block maincontent%}
-    <article class="post">
-        <!-- remove control for Comments/Worklogs -->
-        <button class="butcom blue" id='comment_btn'>Comments</button>
-        <button class="butcom blue" id='worklog_btn'>Worklogs</button><br>
-        <!-- / -->
-         <div class="span6">
-		OWNER: {{task.owner}}<br>
-        </div>
-         <div class="span3">
-    	Kind: {{task.get_kind_display}}<br>
-        </div>
-    	Status: {{task.get_status_display}}<br>
-                    <!-- Form for change  task status -->
-            <form id="status_form" method="POST" action="{% url 'task_detail' projectmodel_id task.id %}">
-                {% csrf_token %}
-                <input type='hidden' value='{{ task.id }}' name='task_id'>
-                <select onchange="form.submit()" name='status'>
-                    <option disabled>Change status</option>
-                        {% for status in statuses%}
-                            {% if status.0 == task.status %}
-                                <option value={{status.0}} selected="selected">{{status.1}}</option>
+<div class="row section featured topspace footspace">
+<div class="row">
+    <div class="col-md-4">
+        <div class="page-container">
+            <div class="pricing-table pricing-table-highlighted">
+                <div class="pricing-table-header">
+                    <h2>{{task.title | capfirst}}</h2>
+                    <h5><i>owner: {{task.owner}}</i></h5>
+                </div>
+
+                <div class="pricing-table-space"></div>
+                <div class="pricing-table-text">
+                    <p><strong>{{task.description | capfirst}}</strong></p>
+                </div>
+
+                <div class="pricing-table-features">
+                    <p><strong>Kind:</strong> {{task.get_kind_display}}</p>
+                    <p><strong>Status:</strong><br>
+                        <form id="status_form" method="POST" action="{% url 'task_detail' projectmodel_id task.id %}">
+                            {% csrf_token %}
+                            <input type='hidden' value='{{ task.id }}' name='task_id' >
+                            <select onchange="form.submit()" name='status' class='form-control'>
+                                <option disabled>Change status</option>
+                                    {% for status in statuses%}
+                                        {% if status.0 == task.status %}
+                                            <option value={{status.0}} selected="selected">{{status.1}}</option>
+                                        {% else %}
+                                            <option value={{status.0}} >{{status.1}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                            </select>   
+                        </form>
+
+                    </p>
+                    <p><strong>Original:</strong> {{task.original_time }}</p>
+                    <p><strong>Remaining:</strong> {{task.estimate_time }}</p>
+                </div>
+            </div>
+        </div>        
+    </div>
+
+    <div class="col-md-8">
+
+        <div class="col-md-6">
+            <div id="comments">
+                <h3 class="comments-title" align="center">Comments</h3>
+                {% if comments %}
+                <ol class="comments-list">
+                    {% for comment in comments%}
+                    <li class="comment">
+                        <div>
+                            {% if comment.user.picture == '' %}
+                                <img class="avatar" alt="avatar" src="/media/no_avatar.jpg/">
                             {% else %}
-                                <option value={{status.0}} >{{status.1}}</option>
+                                <img class="avatar" alt="avatar" src="/media/{{ comment.user.picture }}">
                             {% endif %}
-                        {% endfor %}
-                </select>   
-            </form>
-    	About: {{task.description}}<br>
-    	Original: {{task.original_estimate }}<br>
-    	Remaining {{task.estimate_left }}<br>
-    </article>
 
-    <div class="col-sm-8 col-sm-offset-2">
-        <div class='form-initial'>
-        <div id="respond">
-            <h3 id="reply-title">Add Comment</h3>
+                            <div class="comment-meta">
+                                <span class="author"><a href="#">{{comment.user}}</a></span>
+                                <span class="date"><a href="#">{{comment.date_comment | naturaltime}}</a></span>
+                            </div>
 
-        <form id="comment_form" method="POST" name='comment'>
-            {% csrf_token %}
-            {{comment_form.as_p}}<br>
-            <div class="col-md-4 text-right">
-              <input type="submit" value="submit" class="btn btn-action">
-            </div>
-        </form>
-        </div>
-    </div>
-
-    <div class='form-second'>
-        <div id="respond">
-            <h3 id="reply-title">Add Worklog</h3>
-
-        <form id="worklog_form" method="POST" name='worklog'>
-            {% csrf_token %}
-            {{worklog_form.as_p}}<br>
-            <div class="col-md-4 text-right">
-              <input type="submit" value="submit" class="btn btn-action" name='worklog'>
-            </div>
-        </form>
-        </div>
-    </div>
-
-        <div id="comments"> 
-<!-- Box of comments and worklogs -->
-        <!-- For Comments -->
-        <div class='form-initial'>
-            <h3 class="comments-title">Comments</h3>
-            <ol class="comments-list">
-
-	            {% for comment in comments%}
-                <li class="comment">
-                    <div>
-
-                        {% if comment.user.picture == '' %}
-                            <img class="avatar" alt="avatar" src="/media/no_avatar.jpg/">
-                        {% else %}
-                            <img class="avatar" alt="avatar" src="/media/{{ comment.user.picture }}">
-                        {% endif %}
-
-                        <div class="comment-meta">
-                            <span class="author"><a href="#">{{comment.user}}</a></span>
-                            <span class="date"><a href="#">{{comment.date_comment | naturaltime}}</a></span>
+                            <div class="comment-body">
+                              {{comment.comment}}
+                            </div>
                         </div>
-
-                        <div class="comment-body">
-    		              {{comment.comment}}
-                        </div>
+                    </li>
+                   {% endfor %}
+                </ol>
+                {% else %}
+                <div class="row section topspace">
+                    <div class="col-md-12">
+                        <p class="lead text-center text-muted">No Comments here. Add first!</p>
                     </div>
-                </li>
-	           {% endfor %}
-            </ol>
+                </div>
+                {% endif %}
+            </div>
         </div>
-       <!-- For Worklogs -->
-        <div class='form-second'>
-    	   <h3 class="comments-title">Worklogs</h3>
+
+        <div class="col-md-6">
+        <div id="comments">
+           <h3 class="comments-title" align="center">Worklogs</h3>
+           {% if worklogs %}
             <ol class="comments-list">
                 {% for worklog in worklogs%}
                 <li class="comment">
@@ -138,8 +127,47 @@
                 </li>
                {% endfor %}
             </ol>
+            {% else %}
+            <div class="row section topspace">
+                <div class="col-md-12">
+                    <p class="lead text-center text-muted">No Worklog here. Add first!</p>
+                </div>
+            </div>
+            {% endif %}
         </div>
-<br><br>
+        </div>
+
+        <div class="col-10" align="center">
+                    <button class="butcom blue" id='comment_btn'>Add Comments</button>
+                    <button class="butcom blue" id='worklog_btn'>Add Worklogs</button>
+            <div class='form-initial'>
+                <div id="respond">
+                    <form id="comment_form" method="POST" name='comment'>
+                    {% csrf_token %}
+                    {{comment_form.as_p}}
+
+                      <input type="submit" value="submit" class="btn btn-action" align="right">
+
+                    </form>
+                </div>    
+            </div>
+
+
+            <div class='form-second'>
+                <div id="respond">
+                    <form id="worklog_form" method="POST" name='worklog'>
+                        {% csrf_token %}
+                        {{worklog_form.as_p}}<br>
+                          <input type="submit" value="submit" class="btn btn-action" name='worklog'>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</div>
 {% endblock %}
 
 

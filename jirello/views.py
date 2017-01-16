@@ -1,11 +1,13 @@
 from django.shortcuts import render
-from django.db.models import F
-from jirello.models import Task, Sprint, ProjectModel
-from jirello.models import Comment, Worklog
-from jirello.models.task_model import STATUSES
-from jirello.forms import RegistrationForm, AuthenticationForm
-from jirello.forms import ProjectForm, SprintForm, TaskForm
-from jirello.forms import CommentForm, WorklogForm
+import json
+import datetime
+from django.db.models import F, Sum
+from .models import Task, Sprint, ProjectModel
+from .models import Comment, Worklog
+from .models.task_model import STATUSES
+from .forms import RegistrationForm, AuthenticationForm
+from .forms import ProjectForm, SprintForm, TaskForm
+from .forms import CommentForm, WorklogForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import Http404
 from django.core.urlresolvers import reverse
@@ -16,6 +18,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
 from guardian.decorators import permission_required_or_403 as perm
 from guardian.shortcuts import assign_perm
+from haystack.generic_views import SearchView
 
 
 def register(request):
@@ -97,6 +100,32 @@ def delete_btn(request, obj, projectmodel_id):
 def status_change(request, task_id, status):
     if request.method == 'POST':
         Task.objects.filter(pk=task_id).update(status=status)
+
+
+def chart_time_left(sprint, date):
+    return sprint.sprint_original_estimate - chart_time_spend(sprint, date)
+
+
+def chart_time_spend(sprint, date):
+    logs = Worklog.objects.filter(
+        task__sprints__id=sprint.pk,
+        date_comment__range=[
+            datetime.datetime.combine(
+                sprint.date_start, datetime.datetime.min.time()),
+            datetime.datetime.combine(date, datetime.datetime.min.time())
+            .replace(hour=23, minute=59, second=59),
+        ]
+    )
+    if not logs:
+        return 0
+    return logs.aggregate(total_time=Sum('time_spend'))['total_time']
+
+
+def generete_sprint_date(sprint):
+    date_list = []
+    for n in range(int((sprint.date_end - sprint.date_start).days) + 1):
+        date_list.append(sprint.date_start + datetime.timedelta(n))
+    return date_list
 
 
 def save_data_form(request, form, task_id):
@@ -257,7 +286,9 @@ def project_detail(request, projectmodel_id):
 def sprint_detail(request, projectmodel_id, sprint_id):
     # 404 error if project does not exist
     sprint = Sprint.objects.filter(pk=sprint_id)\
-        .select_related('owner', 'project').first()
+        .select_related('owner', 'project')\
+        .annotate(sprint_original_estimate=Sum('tasks__original_estimate'))\
+        .first()
     if not sprint:
         raise Http404('blabla')
     tasks = Task.objects.filter(sprints__id=sprint_id).order_by('storypoints')
@@ -267,11 +298,24 @@ def sprint_detail(request, projectmodel_id, sprint_id):
             request.POST.get('task_id'),
             request.POST.get('status'),
         )
+    if sprint.tasks.exists():
+        chart_sprint = [
+            {
+                "date": str(date),
+                "column-1": chart_time_left(sprint, date),
+                'column-2': chart_time_spend(sprint, date)
+            }
+            for date in generete_sprint_date(sprint)
+        ]
+        chart_sprint = json.dumps(chart_sprint)
+    else:
+        chart_sprint = None
     context_dict = {
         'sprint': sprint,
         'projectmodel_id': projectmodel_id,
         'tasks': tasks,
-        'statuses': STATUSES
+        'statuses': STATUSES,
+        'chart_sprint': chart_sprint,
     }
     return render(request, 'jirello/sprint_detail.html', context_dict)
 
@@ -313,3 +357,12 @@ def task_detail(request, projectmodel_id, task_id):
         'statuses': STATUSES,
     }
     return render(request, 'jirello/task_detail.html', context_dict)
+
+
+class TaskSearchView(SearchView):
+    template_name = 'jirello/search.html'
+
+    def get_queryset(self):
+        queryset = super(TaskSearchView, self).get_queryset()
+        project_id = self.kwargs['projectmodel_id']
+        return queryset.filter(project=project_id)

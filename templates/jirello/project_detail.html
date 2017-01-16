@@ -16,6 +16,7 @@
 			<li><a href="{% url 'new_task' project.id %}">New Task</a></li>
 		</ul>
 	</li>
+	<li><a href="{% url 'task_search' projectmodel_id=project.id %}">Task search </a></li>
 {% endblock %}
 
 {% block maincontent%}
@@ -54,10 +55,11 @@
 			tasks:
 		</span></h4>
 	{% if project.tasks.all %}
+
 		<ul>
-		{% for t in project.tasks.all %}
-			<li><a class='task-a nav-side' href="{% url 'task_detail' projectmodel_id=project.id task_id=t.id%}">
-				{{t.title | capfirst}}
+		{% for task in project.tasks.all %}
+			<li><a class='task-a nav-side' href="{% url 'task_detail' projectmodel_id=project.id task_id=task.id%}">
+				{{task.title | capfirst}}
 			</a></li>
 		{% endfor %}
 	{% else %}
@@ -75,8 +77,8 @@
 	<article class="col-10 maincontent">
 		<h3>Workers:</h3>
 
-		{% for u in project.users.all %}
-			<a class='cross-a' href='#'>{{u.email}}</a>, 
+		{% for user in project.users.all %}
+			<a class='cross-a' href='#'>{{user.email}}</a>, 
 		{% endfor%}
 	</article>
 </div>
