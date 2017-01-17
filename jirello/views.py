@@ -103,7 +103,10 @@ def status_change(request, task_id, status):
 
 
 def chart_time_left(sprint, date):
-    return sprint.sprint_original_estimate - chart_time_spend(sprint, date)
+    duration = sprint.sprint_original_estimate - chart_time_spend(sprint, date)
+    if duration < 0:
+        return 0
+    return duration
 
 
 def chart_time_spend(sprint, date):
@@ -139,7 +142,9 @@ def save_data_form(request, form, task_id):
             Task.objects.filter(pk=task_id).update(
                 remaining_estimate=(F('remaining_estimate') - f.time_spend))
         except:
-            pass
+            f.time_spend = form.cleaned_data['time_spend']
+            Task.objects.filter(pk=task_id).update(
+                remaining_estimate=0)
         f.save()
 
 
@@ -302,8 +307,8 @@ def sprint_detail(request, projectmodel_id, sprint_id):
         chart_sprint = [
             {
                 "date": str(date),
-                "column-1": chart_time_left(sprint, date),
-                'column-2': chart_time_spend(sprint, date)
+                "duration": chart_time_left(sprint, date) / 60,
+                "worklog": chart_time_spend(sprint, date) / 60,
             }
             for date in generete_sprint_date(sprint)
         ]

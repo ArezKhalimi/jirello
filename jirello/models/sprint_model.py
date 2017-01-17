@@ -28,3 +28,5 @@ class Sprint(models.Model):
                 and self.project.sprints.filter(is_active=True)\
                 .exclude(pk=self.pk).exists():
             raise ValidationError('You already have active sprint!')
+        if self.date_start > self.date_end:
+            raise ValidationError('Wrong date range')
