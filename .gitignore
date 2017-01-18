@@ -1,1 +1,11 @@
 *.pyc
+*.png
+*.jpg
+*.jpeg
+secure.py
+celerybeat-schedule
+dump.rdb
+/media
+unittest
+jirello.log
+haystack.autodiscover

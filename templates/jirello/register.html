@@ -1,16 +1,23 @@
-<!DOCTYPE html>
-<html>
+{% extends 'base.html' %}
+{% load staticfiles %}
 
-    <body>
-        <h1>Please sign in</h1>
+{% block title %}
+	Jirello | Join to jirello!
+{% endblock %}
 
-        <form id="register_form" method="POST" action="{% url 'register' %}">
+{% block header %}
+    <span class="title">Join to Jirello!</span>
+    <span class="tagline">Join to pro</span>
+{% endblock %}
+
+{% block maincontent%}
+<article class="col-sm-6 col-sm-offset-3">
+        <form id="register_form" method="POST" action="{% url 'register' %}" enctype='multipart/form-data'>
             {% csrf_token %}
             {{register_form.as_p}}
-            <input type="submit" value="submit" />
+		  	<div class="col-md-8 text-right">
+				<input type="submit" value="submit" class="btn btn-action">
+			</div>
         </form>
-    <a href="{% url 'login' %}">login</a>
-    <a href="{% url 'logout' %}">logout</a>
-    </body>
-
-</html>
+</article>
+{% endblock %}

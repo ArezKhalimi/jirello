@@ -1,14 +1,20 @@
-<!DOCTYPE html>
-<html>
-	<body>
-<h1>Login</h1>
-        <form method="post" action="/jirello/login/">
-                {% csrf_token %}
-                {{ auth_form.as_p }}
+{% extends 'base.html' %}
+{% block title %}Jirello Sign In{% endblock %}
+{% block header %}
+    <span class="title">Welcome to Jirello</span>
+    <span class="tagline">Created by Arez Khalimi</span>
+{% endblock %}
+{% block sidebarlink %}{% endblock %}
+{% block maincontent%}
+<article class="col-sm-4 maincontent">
+    <form  method="post" action="/jirello/login/">
+        {% csrf_token %}
+        {{ auth_form.as_p }}
+     	<div class="col-md-8 text-right">
+        	<input class="btn btn-action" type="submit" value="Login" />
+        </div>
+    </form>
+</article>    
+    
 
-                <input type="submit" value="Log in" />
-                </form>
-
-        <p>Not  a member? <a href="{% url 'register' %}">Register</a>!</p>
-    </body>
-</html>
+{% endblock %}
