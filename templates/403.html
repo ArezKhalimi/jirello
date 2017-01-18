@@ -1,9 +1,28 @@
-<!DOCTYPE html>
-<html>
-	<body>
-	<h3>You don't have permission to this!</h3>
-	Dear {{user}}!<br>
-	Sory, You tried to gain access to privileged information
+{% extends 'base.html' %}
+{% block title %}Jirello main page{% endblock %}
 
-    </body>
-</html>
+{% block header %}
+    {% if user.is_authenticated %}
+    <span class="title">{{ user }}</span>
+    <span class="tagline">{{ user.email }}</span>
+    {% else %}
+    <span class="title">Welcome to Jirello</span>
+    <span class="tagline">Created by Arez Khalimi</span>
+    {% endif %}
+{% endblock %}
+
+
+{% block maincontent%}
+
+<div class="col-sm-8 col-sm-offset-2">
+	<article class="post">
+		<header class="entry-header">
+   			<h1 class="entry-title">You don't have permission to this!</h1>
+   		</header>
+		<div class="entry-content" align='center'>
+			<p><img alt="" src="/media/403.png/"></p>
+			Dear {{user}}!<br>
+			Sory, You tried to gain access to privileged information!
+        </div>
+	</article>
+{% endblock %}

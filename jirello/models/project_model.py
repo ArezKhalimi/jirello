@@ -1,5 +1,6 @@
 from django.db import models
 from .user_model import User
+#from django_elasticsearch.models import EsIndexable
 
 
 class ProjectModel(models.Model):

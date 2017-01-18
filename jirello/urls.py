@@ -15,6 +15,9 @@ urlpatterns = patterns(
         include(patterns(
             '',
             url(r'^$', views.project_detail, name='project_detail'),
+            url(r'^search/',
+                views.TaskSearchView.as_view(),
+                name='task_search'),
             url(r'^edit_project/$', views.edit_project, name='edit_project'),
             url(r'^new_task/$', views.new_task, name='new_task'),
             url(r'^new_sprint/$', views.new_sprint, name='new_sprint'),

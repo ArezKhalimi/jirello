@@ -46,8 +46,8 @@ class Migration(migrations.Migration):
             name='Comment',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('comment', models.TextField()),
-                ('date_comment', models.DateTimeField()),
+                ('comment', models.CharField(max_length=400)),
+                ('date_comment', models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
@@ -67,8 +67,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('title', models.CharField(unique=True, max_length=128)),
-                ('date_start', models.DateTimeField()),
-                ('date_end', models.DateTimeField()),
+                ('date_start', models.DateField()),
+                ('date_end', models.DateField()),
                 ('is_active', models.BooleanField()),
                 ('owner', models.ForeignKey(related_name='created_sprints', to=settings.AUTH_USER_MODEL)),
                 ('project', models.ForeignKey(related_name='sprints', to='jirello.ProjectModel')),
@@ -95,10 +95,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Worklog',
             fields=[
-                ('comment_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='jirello.Comment')),
-                ('time_spend', models.PositiveIntegerField()),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('time_spend', models.PositiveIntegerField(null=True, blank=True)),
+                ('comment', models.CharField(max_length=400)),
+                ('date_comment', models.DateTimeField(auto_now_add=True)),
+                ('task', models.ForeignKey(related_name='worklog', to='jirello.Task')),
+                ('user', models.ForeignKey(related_name='worklog', to=settings.AUTH_USER_MODEL)),
             ],
-            bases=('jirello.comment',),
         ),
         migrations.AddField(
             model_name='comment',

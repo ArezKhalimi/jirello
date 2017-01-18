@@ -8,9 +8,9 @@
 
 	<title>{% block title %}{% endblock %}</title>
 	<!-- favicon ne rabotaet -->
-	<link rel="shortcut icon" href="{% static 'jirello/images/favicon.png' %}">
+	<link rel="shortcut icon" href="{% static 'jirello/images/favicon.ico' %}">
 	<!-- Bootstrap -->
-	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.no-icons.min.css" rel="stylesheet">
+	<link href="{% static 'jirello/css/bootstrap.no-icons.min.css' %}" rel="stylesheet">
 	<!-- Icon font -->
 	<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 	<!-- Fonts -->
@@ -26,7 +26,8 @@
 <header id="header">
 	<div id="head" class="parallax" parallax-speed="1">
 		<h1 id="logo" class="text-center">
-			{% block header %}{% endblock %}
+			{% block header %}    <span class="title">Welcome to Jirello</span>
+    <span class="tagline">Created by Arez Khalimi</span>{% endblock %}
 		</h1>
 	</div>
 
@@ -34,7 +35,12 @@
 		<div class="container-fluid">
 			
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+				<a class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"> 
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				 <span class="icon-bar"></span>
+				</a>
 			</div>
 			
 			<div class="navbar-collapse collapse">
@@ -42,6 +48,7 @@
 				<ul class="nav navbar-nav">
 					<li class="active"><a href="{% url 'main' %}">Home</a></li>
 					<li><a href="{% url 'projects' %}">My Projects</a></li>
+					{% block menu %}{% endblock %}
 					{% if not user.is_authenticated %}
 				 	<li><a href="{% url 'register' %}">register</a></li>
 				    <li><a href="{% url 'login' %}">login</a></li>
@@ -75,9 +82,9 @@
 </main>
 
 <!-- JavaScript libs are placed at the end of the document so the pages load faster -->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 
-<script src="{% static 'jirello/js/template.js' %}"></script>
+<script src="{% static 'jirello/js/jquery.min.js' %}"></script>
+<script src="{% static 'jirello/js/bootstrap.min.js' %}"></script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

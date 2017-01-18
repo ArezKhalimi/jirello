@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Jirello main page{% endblock %}
+
+{% block header %}
+    {% if user.is_authenticated %}
+    <span class="title">{{ user }}</span>
+    <span class="tagline">{{ user.email }}</span>
+    {% else %}
+    <span class="title">Welcome to Jirello</span>
+    <span class="tagline">Created by Arez Khalimi</span>
+    {% endif %}
+{% endblock %}
+
+
+{% block maincontent%}
+
+<div class="col-sm-8 col-sm-offset-2">
+    <article class="post">
+        <div class="entry-content" align='center'>
+            <p><img alt="" src="/media/404.png/"></p>
+        </div>
+    </article>
+{% endblock %}

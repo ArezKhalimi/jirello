@@ -1,12 +1,37 @@
-<!DOCTYPE html>
-<html>
-	<body>
+{% extends 'base.html' %}
+{% load staticfiles %}
 
-<form id="form" method="POST" action="{% url 'new_task' project_id %}">
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" value="submit"  />
-</form>
- 	<a href="{% url 'projects' %}">Cancel</a>
- 	</body>
-</html>
+{% block title %}
+	Jirello | New Task
+{% endblock %}
+
+{% block header %}
+    <span class="title">New Task</span>
+    <span class="tagline">{{ user.email }}</span>
+{% endblock %}
+
+{% block menu %}
+    <li><a href="{% url 'project_detail' project_id %}">Back to project</a></li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Create <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a href="{% url 'new_project' %}">New Project</a></li>
+            <li><a href="{% url 'new_sprint' project_id %}">New Sprint</a></li>
+            <li><a href="{% url 'new_task' project_id %}">New Task</a></li>
+        </ul>
+    </li>
+{% endblock %}
+
+
+
+{% block maincontent%}
+<article class="col-sm-6 col-sm-offset-3">
+	<form id="form" method="POST" action="{% url 'new_task' project_id %}">
+	    {% csrf_token %}
+	    {{form.as_p}}
+	    <div class="col-md-8 text-right">
+	    	<input type="submit" value="submit" class="btn btn-action">
+	    </div>
+	</form>
+</article>
+{% endblock %}
