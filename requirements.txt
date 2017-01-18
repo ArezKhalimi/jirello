@@ -1,0 +1,7 @@
+Python==2.7.9
+Django==1.8
+Celery==4.0.2
+celery[redis]
+django-guardian==1.4.6
+django-haystack==2.6.0
+django_celery_beat==1.0.1

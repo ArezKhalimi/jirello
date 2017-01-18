@@ -1,10 +1,200 @@
-<!DOCTYPE html>
-<html>
-	<body>
-	<a href="{% url 'edit_task' projectmodel_id=projectmodel_id task_id=task.id %}">Edit task</a><br>
-		Task: {{task.title}}<br>
-    	Kind: {{task.get_kind_display}}<br>
-    	Status: {{task.get_status_display}}<br>
-    	About: {{task.description}}<br>
-	</body>
-</html>
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Jirello | {{ task.title }}{% endblock %}
+
+{% block header %}
+    <span class="title"><a href="{% url 'project_detail' projectmodel_id %}">{{task.project}}</a></span>
+    <span class="tagline">Task: {{ task.title }}</span>
+{% endblock %}
+
+{% block menu %}
+    <li><a href="{% url 'edit_task' projectmodel_id=projectmodel_id task_id=task.id %}">Edit task</a></li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Create <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a href="{% url 'new_project' %}">New Project</a></li>
+            <li><a href="{% url 'new_sprint' projectmodel_id %}">New Sprint</a></li>
+            <li><a href="{% url 'new_task' projectmodel_id %}">New Task</a></li>
+        </ul>
+    </li>
+{% endblock %}
+
+{% block maincontent%}
+<div class="row section featured topspace footspace">
+<div class="row">
+    <div class="col-md-4">
+        <div class="page-container">
+            <div class="pricing-table pricing-table-highlighted">
+                <div class="pricing-table-header">
+                    <h2>{{task.title | capfirst}}</h2>
+                    <h5><i>owner: {{task.owner}}</i></h5>
+                </div>
+
+                <div class="pricing-table-space"></div>
+                <div class="pricing-table-text">
+                    <p><strong>{{task.description | capfirst}}</strong></p>
+                </div>
+
+                <div class="pricing-table-features">
+                    <p><strong>Kind:</strong> {{task.get_kind_display}}</p>
+                    <p><strong>Status:</strong><br>
+                        <form id="status_form" method="POST" action="{% url 'task_detail' projectmodel_id task.id %}">
+                            {% csrf_token %}
+                            <input type='hidden' value='{{ task.id }}' name='task_id' >
+                            <select onchange="form.submit()" name='status' class='form-control'>
+                                <option disabled>Change status</option>
+                                    {% for status in statuses%}
+                                        {% if status.0 == task.status %}
+                                            <option value={{status.0}} selected="selected">{{status.1}}</option>
+                                        {% else %}
+                                            <option value={{status.0}} >{{status.1}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                            </select>   
+                        </form>
+
+                    </p>
+                    <p><strong>Original:</strong> {{task.original_time }}</p>
+                    <p><strong>Remaining:</strong> {{task.estimate_time }}</p>
+                </div>
+            </div>
+        </div>        
+    </div>
+
+    <div class="col-md-8">
+
+        <div class="col-md-6">
+            <div id="comments">
+                <h3 class="comments-title" align="center">Comments</h3>
+                {% if comments %}
+                <ol class="comments-list">
+                    {% for comment in comments%}
+                    <li class="comment">
+                        <div>
+                            {% if comment.user.picture == '' %}
+                                <img class="avatar" alt="avatar" src="/media/no_avatar.jpg/">
+                            {% else %}
+                                <img class="avatar" alt="avatar" src="/media/{{ comment.user.picture }}">
+                            {% endif %}
+
+                            <div class="comment-meta">
+                                <span class="author"><a href="#">{{comment.user}}</a></span>
+                                <span class="date"><a href="#">{{comment.date_comment | naturaltime}}</a></span>
+                            </div>
+
+                            <div class="comment-body">
+                              {{comment.comment}}
+                            </div>
+                        </div>
+                    </li>
+                   {% endfor %}
+                </ol>
+                {% else %}
+                <div class="row section topspace">
+                    <div class="col-md-12">
+                        <p class="lead text-center text-muted">No Comments here. Add first!</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+        <div id="comments">
+           <h3 class="comments-title" align="center">Worklogs</h3>
+           {% if worklogs %}
+            <ol class="comments-list">
+                {% for worklog in worklogs%}
+                <li class="comment">
+                    <div>
+
+                        {% if worklog.user.picture == '' %}
+                            <img class="avatar" alt="avatar" src="/media/no_avatar.jpg/">
+                        {% else %}
+                            <img class="avatar" alt="avatar" src="/media/{{ worklog.user.picture }}">
+                        {% endif %}
+
+                        <div class="comment-meta">
+                            <span class="author"><a href="#">{{worklog.user}}</a></span>
+                            <span class="date"><a href="#">{{worklog.date_comment | naturaltime}}</a></span>
+                            <span class="author"><a href="#">{{worklog.time_show}}</a></span>
+                            </div>
+
+                        <div class="comment-body">
+                          {{worklog.comment}}
+                        </div>
+                    </div>
+                </li>
+               {% endfor %}
+            </ol>
+            {% else %}
+            <div class="row section topspace">
+                <div class="col-md-12">
+                    <p class="lead text-center text-muted">No Worklog here. Add first!</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        </div>
+
+        <div class="col-10" align="center">
+                    <button class="butcom blue" id='comment_btn'>Add Comments</button>
+                    <button class="butcom blue" id='worklog_btn'>Add Worklogs</button>
+            <div class='form-initial'>
+                <div id="respond">
+                    <form id="comment_form" method="POST" name='comment'>
+                    {% csrf_token %}
+                    {{comment_form.as_p}}
+
+                      <input type="submit" value="submit" class="btn btn-action" align="right">
+
+                    </form>
+                </div>    
+            </div>
+
+
+            <div class='form-second'>
+                <div id="respond">
+                    <form id="worklog_form" method="POST" name='worklog'>
+                        {% csrf_token %}
+                        {{worklog_form.as_p}}<br>
+                          <input type="submit" value="submit" class="btn btn-action" name='worklog'>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<!-- Hide forms initially with Javascript (visible for non Javascript users) -->
+<script type="text/javascript">
+    $("#comment_btn").addClass('active');
+    $(".form-second").hide();
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    // hide the forms when page is ready
+    $('#comment_btn').click(function(){ 
+        $('#worklog_btn').removeClass('active');
+        $(this).addClass('active');
+        $('.form-initial').show();
+        $('.form-second').hide();
+        
+    });
+    $('#worklog_btn').click(function(){ 
+        $('#comment_btn').removeClass('active');
+        $(this).addClass('active');
+        $('.form-second').show();
+        $('.form-initial').hide();
+
+    });
+});
+</script>
+{% endblock %}

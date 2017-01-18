@@ -1,20 +1,138 @@
-<!DOCTYPE html>
-<html>
-	<body>
-	<a href="{% url 'edit_sprint' projectmodel_id=projectmodel_id sprint_id=sprint.id %}">Edit sprint</a><br>
-	<h1>ID{{sprint.id}}</h1>
-		<br>title  {{sprint.title}}
-		<br>date_start = {{sprint.date_start}}
-		<br>date_end = {{sprint.date_end}}
-		<br>is_active = {{sprint.is_active}}
-<br><br>____TASKS____<br>
-		{% for t in tasks%}
-			<a href="{% url 'task_detail' projectmodel_id=projectmodel_id task_id=t.id%}">
-			<h5>{{t.title}}</h5>
-			</a>
+{% extends 'base.html' %}
+{% block title %}Jirello | {{ sprint.title }}{% endblock %}
+
+{% block header %}
+    <span class="title"><a href="{% url 'project_detail' projectmodel_id %}">{{sprint.project}}</a></span>
+    <span class="tagline">Sprint: '{{ sprint.title }}' directed by {{sprint.owner}}</span>
+{% endblock %}
+
+{% block menu %}
+    <li><a href="{% url 'edit_sprint' projectmodel_id=projectmodel_id sprint_id=sprint.id %}">Edit sprint</a></li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Create <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a href="{% url 'new_project' %}">New Project</a></li>
+            <li><a href="{% url 'new_sprint' projectmodel_id %}">New Sprint</a></li>
+            <li><a href="{% url 'new_task' projectmodel_id %}">New Task</a></li>
+        </ul>
+    </li>
+{% endblock %}
+
+{% block maincontent%}
+<dir>
+			<article class="post">
+				<p class="lead text-center "><b>Sprint '{{ sprint.title }}' {% if sprint.is_active %}<a>is active!</a>{% else %} not active.{%endif%}</b></p>
+
+				<p class="lead text-center text-muted">Current time working with Sprint<br>
+				<a>{{sprint.date_start|date:'d M Y'}}</a> - <a>{{sprint.date_end|date:'d M Y'}}</a> 
+				</p>
+				    <span class="tagline"> owner: {{sprint.owner}}</span>
+
+			</article>	
+</dir>
+
+	<article class="post">
+
+		<h2 class="section-title"><span>Tasks</span></h2>
+
+		{% for task in tasks%}
+		<div class="col-sm-6 col-md-3">
+			<h5><a href="{% url 'task_detail' projectmodel_id=projectmodel_id task_id=task.id%}" >
+			{{task.title}}
+			</a></h5>
+
+			<!-- Form for change  task status -->
+			<form id="status_form" method="POST" action="{% url 'sprint_detail' projectmodel_id sprint.id %}">
+				{% csrf_token %}
+				<input type='hidden' value='{{ task.id }}' name='task_id'>
+				<select onchange="form.submit()" name='status'>
+					<option disabled>Change status</option>
+						{% for status in statuses%}
+							{% if status.0 == task.status %}
+								<option value={{status.0}} selected="selected">{{status.1}}</option>
+							{% else %}
+								<option value={{status.0}} >{{status.1}}</option>
+							{% endif %}
+						{% endfor %}
+				</select>	
+			</form>
+		</div>
+	</article>
 		{% endfor %}
+<div id="chartdiv" style="width: 100%; height: 400px; background-color: #FFFFFF;" ></div>
+{% endblock %}
 
-<br>Sprint owner = {{sprint.owner}}
 
-	</body>
-</html>
+{% block scripts %}
+<script type="text/javascript" src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+<script type="text/javascript" src="https://www.amcharts.com/lib/3/serial.js"></script>
+		
+
+		<!-- amCharts javascript code -->
+		<script type="text/javascript">
+			console.log('{{ chart_sprint | escapejs }}')
+			var jsonObject = JSON.parse('{{ chart_sprint | escapejs }}')
+			var chart = AmCharts.makeChart("chartdiv",
+				{
+					"type": "serial",
+					"categoryField": "date",
+					"dataDateFormat": "YYYY-MM-DD",
+					"categoryAxis": {
+						"parseDates": true
+					},
+					"chartCursor": {
+						"enabled": true
+					},
+					"chartScrollbar": {
+						"enabled": true
+					},
+					"trendLines": [],
+					"graphs": [
+						{
+					        "bullet": "square",
+					        "fillColorsField": "lineColor",
+					        "legendValueText": "[[value]]",
+					        "lineColorField": "lineColor",
+					        "lineColor": "#e93675",
+					        "title": "Time Left",
+					        "valueField": "duration"
+					    },
+						{
+							"bullet": "bubble",
+							"id": "AmGraph-2",
+							"title": "Total Worklog Time",
+							"valueField": "worklog",
+							"lineColor": "#55acee",
+						}
+					],
+					"guides": [],
+					"valueAxes": [{
+					        "duration": "mm",
+					        "durationUnits": {
+					        	"DD": "d ",
+					            "hh": "h ",
+					            "mm": "min"
+					        },
+					        "axisAlpha": 0
+					    }],
+					"allLabels": [],
+					"balloon": {},
+					"legend": {
+						"enabled": true,
+						"useGraphSettings": true
+					},
+					"titles": [
+						{
+							"id": "Title-1",
+							"size": 15,
+							"text": "Sprint {{ sprint.title }} statistic"
+						}
+					],
+					"dataProvider":
+					jsonObject 
+				}
+			);
+		</script>
+{% endblock %}
+
+
