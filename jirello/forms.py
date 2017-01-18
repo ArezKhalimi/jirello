@@ -59,7 +59,6 @@ class RegistrationForm(forms.ModelForm):
 
     def clean(self):
         # Verifies that the values entered into the password fields match
-        # cleaned_data = super(RegistrationForm, self).clean()
         if 'password1' in self.cleaned_data \
                 and 'password2' in self.cleaned_data:
             if self.cleaned_data['password1']\
@@ -228,7 +227,7 @@ class TaskForm(forms.ModelForm):
         max_length=10,
         widget=forms.TextInput(
             attrs={'class': 'form-control',
-                   'placeholder': '!!!!!!!!INSTRUCTIONS!!!!!!',
+                   'placeholder': 'Add h or H for hours & m or M for minutes',
                    }
         )
     )
@@ -324,7 +323,7 @@ class WorklogForm(forms.ModelForm):
         max_length=10,
         widget=forms.TextInput(
             attrs={'class': 'form-control',
-                   'placeholder': '!!!!!!!!INSTRUCTIONS!!!!!!',
+                   'placeholder': 'Add h or H for hours & m or M for minutes',
                    }
         )
     )

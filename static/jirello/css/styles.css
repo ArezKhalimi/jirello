@@ -4,7 +4,7 @@ html {
 body {
   font-size: 15px;
   font-size: 0.9375rem;
-  font-family: "Open sans", Helvetica, Arial, sans-serif;
+  font-family: "Open sans",Trebuchet MS, Helvetica, Arial, sans-serif;
   color: #666666;
   padding: 0;
 }
@@ -847,6 +847,7 @@ footer.entry-meta .meta-in {
   font-weight: bold;
   color: #55acee;
   border: 2px #55acee solid;
+  width: 215px !important;
 }
 .blue:hover,
 .blue:focus,

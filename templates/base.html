@@ -8,9 +8,9 @@
 
 	<title>{% block title %}{% endblock %}</title>
 	<!-- favicon ne rabotaet -->
-	<link rel="shortcut icon" href="{% static 'jirello/images/favicon.png' %}">
+	<link rel="shortcut icon" href="{% static 'jirello/images/favicon.ico' %}">
 	<!-- Bootstrap -->
-	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.no-icons.min.css" rel="stylesheet">
+	<link href="{% static 'jirello/css/bootstrap.no-icons.min.css' %}" rel="stylesheet">
 	<!-- Icon font -->
 	<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 	<!-- Fonts -->
@@ -83,8 +83,8 @@
 
 <!-- JavaScript libs are placed at the end of the document so the pages load faster -->
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="{% static 'jirello/js/jquery.min.js' %}"></script>
+<script src="{% static 'jirello/js/bootstrap.min.js' %}"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Jirello main page{% endblock %}
-
+{% load staticfiles %}
 {% block header %}
     {% if user.is_authenticated %}
         {% if user.picture == '' %}
@@ -16,66 +16,56 @@
     {% endif %}
 {% endblock %}
 
-{% block sidebarlink %}
-<a href="{% url 'projects' %}">My Projects</a>
-<br>
-    {% if not user.is_authenticated %}
- 	<a href="{% url 'register' %}">register</a>
-    <a href="{% url 'login' %}">login</a>
-    {% elif user.is_authenticated %}
-    <a href="{% url 'logout' %}">logout</a>
-    {% endif %}
-{% endblock %}
-
 {% block maincontent%}
 
-<article class="col-sm-8 maincontent">
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet, consequuntur eius repellendus eos aliquid molestiae ea laborum ex quibusdam laudantium voluptates placeat consectetur quam aliquam beatae soluta accusantium iusto nihil nesciunt unde veniam magnam repudiandae sapiente.</p>
-
-                <!-- Forms HTML -->
-<div id="form-A">
-    ... html form here ....
+<div class="row section featured topspace">
+    <div class="col-lg-10 col-md-offset-1" align="center">
+        <img src="{% static 'jirello/images/jirello.png' %}">
+        <h3>
+        Organize your project managment with Jirello!
+        </h3>
+    </div>
+    <div class="col-lg-10 col-md-offset-1" align="center">
+        <img src="{% static 'jirello/images/communication.png' %}">
+        <h3>Simple communication with team.</h3>
+        <ul style="list-style-type:none" class="lead text-muted" >
+            <li> Share you own expriance in Comments</li>
+            <li>Report your progress adding Worklogs</li>
+        </ul>
+    </div>
+    <div class="col-lg-10 col-md-offset-1" align="center">
+        <img src="{% static 'jirello/images/privacy.png' %}">
+        <h3>Privacy.</h3>
+        <ul style="list-style-type:none" class="lead text-muted">
+            <li>Nobody will be able to see the details of your project except for your team.</li>
+        </ul>
+    </div>
+    <div class="col-lg-10 col-md-offset-1" align="center">
+        <img src="{% static 'jirello/images/manage.png' %}">
+        <h3>Create and manage projects tasks!</h3>
+        <ul style="list-style-type:none" class="lead text-muted">
+            <li>Set priorities</li>
+            <li>Assign a set of in-line tasks with Sprint</li>
+        </ul>
+    </div>
+    <div class="col-lg-10 col-md-offset-1" align="center">
+        <img src="{% static 'jirello/images/chart.png' %}">
+        <h3>You lost something?</h3>
+        <ul style="list-style-type:none" class="lead text-muted">
+            <li>Сonvenient and simple search tasks at your service</li>
+            <li>Chart statistics</li>
+        </ul>
+    </div>
+    <div class="col-lg-10 col-md-offset-1" align="center">
+        <img src="{% static 'jirello/images/mail.png' %}">
+        <h3>Sending results by e-mail</h3>
+        <ul style="list-style-type:none" class="lead text-muted">
+            <li>Always be informed when work done!</li>
+        </ul>     
+    </div>
 </div>
-<div id="form-B">
-    ... another html form here ....
-</div>
-<!-- A dropdown to select a value -->
-<select id="choose-form">
-    <option>Please choose...</option>
-    <option value="form-A">Some form</option>
-    <option value="form-B">Another form</option>
-</select>
-
-
-    
-</article>
 {% endblock %}
-<!-- Hide forms initially with Javascript (visible for non Javascript users) 
-
-JTimePICKER INTEGRATIONS
-jtp .js
-ui.core.js
-ui.slider.js
-
--->
-
-
 
 {% block scripts %}
-<!-- Hide forms initially with Javascript (visible for non Javascript users) -->
-<script type="text/javascript">
-    $("#form-A, #form-B").hide();
-</script>
 
-<!-- and some simple jQuery -->
-<script type="text/javascript">
-    $(document).ready(function() {
-        $("#choose-form").change(function() {
-
-            //Hide -other- visible forms
-            $("#form-A, #form-B").hide();
-            $("#" + $(this).val()).show();
-        });
-    });
-</script>
 {% endblock %}

@@ -13,6 +13,7 @@ from django.http import Http404
 from django.core.urlresolvers import reverse
 
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.contrib.auth import authenticate as auth_authenticate
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
@@ -93,8 +94,6 @@ def projects(request):
 def delete_btn(request, obj, projectmodel_id):
     if request.POST.get('delete'):
         obj.delete()
-        return HttpResponseRedirect(
-            reverse('project_detail', args=[projectmodel_id, ]))
 
 
 def status_change(request, task_id, status):
@@ -234,6 +233,8 @@ def edit_sprint(request, projectmodel_id, sprint_id):
         # need add perm for delete ( just for project creator)has_perms
         if is_creator:
             delete_btn(request, sprint, projectmodel_id)
+            return HttpResponseRedirect(
+                reverse('project_detail', args=[projectmodel_id, ]))
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse(
@@ -258,7 +259,9 @@ def edit_task(request, projectmodel_id, task_id):
         # need add perm for delete ( just for project creator)
         if is_creator:
             delete_btn(request, task, projectmodel_id)
-
+            return HttpResponseRedirect(reverse(
+                'project_detail', args=[projectmodel_id, ]
+            ))
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse(
@@ -366,6 +369,12 @@ def task_detail(request, projectmodel_id, task_id):
 
 class TaskSearchView(SearchView):
     template_name = 'jirello/search.html'
+
+    @method_decorator(
+        perm('can_view', (ProjectModel, 'pk', 'projectmodel_id'))
+    )
+    def dispatch(self, *args, **kwargs):
+        return super(TaskSearchView, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
         queryset = super(TaskSearchView, self).get_queryset()
