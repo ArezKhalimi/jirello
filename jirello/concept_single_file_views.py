@@ -1,25 +1,27 @@
-from django.shortcuts import render
 import json
 import datetime
-from django.db.models import F, Sum
+
+from django.shortcuts import render
+from django.db.models import F, Sum, Case, When, IntegerField
+from django.http import HttpResponse, HttpResponseRedirect
+from django.http import Http404
+from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.contrib.auth import authenticate as auth_authenticate
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import login as auth_login
+
+from guardian.decorators import permission_required_or_403 as perm
+from guardian.shortcuts import assign_perm
+from haystack.generic_views import SearchView
+
 from .models import Task, Sprint, ProjectModel
 from .models import Comment, Worklog
 from .models.task_model import STATUSES
 from .forms import RegistrationForm, AuthenticationForm
 from .forms import ProjectForm, SprintForm, TaskForm
 from .forms import CommentForm, WorklogForm
-from django.http import HttpResponse, HttpResponseRedirect
-from django.http import Http404
-from django.core.urlresolvers import reverse
-
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.contrib.auth import authenticate as auth_authenticate
-from django.contrib.auth import logout as auth_logout
-from django.contrib.auth import login as auth_login
-from guardian.decorators import permission_required_or_403 as perm
-from guardian.shortcuts import assign_perm
-from haystack.generic_views import SearchView
 
 
 def register(request):
@@ -101,36 +103,28 @@ def status_change(request, task_id, status):
         Task.objects.filter(pk=task_id).update(status=status)
 
 
-def chart_time_left(sprint, date):
-    duration = sprint.sprint_original_estimate - chart_time_spend(sprint, date)
+def chart_time_left(sprint, dates_kwarg, date):
+    duration = sprint.sprint_original_estimate - chart_time_spend(sprint, dates_kwarg, date)
     if duration < 0:
         return 0
     return duration
 
 
-def chart_time_spend(sprint, date):
-    logs = Worklog.objects.filter(
-        task__sprints__id=sprint.pk,
-        date_comment__range=[
-            datetime.datetime.combine(
-                sprint.date_start, datetime.datetime.min.time()),
-            datetime.datetime.combine(date, datetime.datetime.min.time())
-            .replace(hour=23, minute=59, second=59),
-        ]
-    )
-    if not logs:
+def chart_time_spend(sprint, dates_kwarg, date):
+    time_spend = getattr(sprint, dates_kwarg[date])
+    if not time_spend:
         return 0
-    return logs.aggregate(total_time=Sum('time_spend'))['total_time']
+    return time_spend
 
 
-def generete_sprint_date(sprint):
+def generate_sprint_date(sprint):
     date_list = []
     for n in range(int((sprint.date_end - sprint.date_start).days) + 1):
         date_list.append(sprint.date_start + datetime.timedelta(n))
     return date_list
 
 
-def save_data_form(request, form, task_id):
+def commit_task(request, form, task_id):
     if form.is_valid():
         f = form.save(commit=False)
         f.user = request.user
@@ -307,13 +301,33 @@ def sprint_detail(request, projectmodel_id, sprint_id):
             request.POST.get('status'),
         )
     if sprint.tasks.exists():
+        date_list = generate_sprint_date(sprint)
+        annotation_kwarg = {}
+        dates_kwarg = {}
+        counter = 1
+        annotation_kwarg['sprint_original_estimate'] = Sum('tasks__original_estimate')
+        for date in date_list:
+            annotation_kwarg["day_{}".format(counter)] = Sum(
+            Case(When(
+                tasks__worklog__date_comment__range=[
+                    datetime.datetime.combine(sprint.date_start,datetime.datetime.min.time()),
+                    datetime.datetime.combine(date, datetime.datetime.min.time()).replace(hour=23, minute=59, second=59)
+                ],
+                then=F('tasks__worklog__time_spend')
+                ),
+                output_field=IntegerField())
+            )
+            dates_kwarg[date] = "day_{}".format(counter)
+            counter += 1
+        sprint_with_dates = Sprint.objects.filter(pk=sprint_id).annotate(**annotation_kwarg).first()
+
         chart_sprint = [
             {
                 "date": str(date),
-                "duration": chart_time_left(sprint, date) / 60,
-                "worklog": chart_time_spend(sprint, date) / 60,
+                "duration": chart_time_left(sprint_with_dates, dates_kwarg, date) / 60,
+                "worklog": chart_time_spend(sprint_with_dates, dates_kwarg, date) / 60,
             }
-            for date in generete_sprint_date(sprint)
+            for date in date_list
         ]
         chart_sprint = json.dumps(chart_sprint)
     else:
@@ -350,10 +364,10 @@ def task_detail(request, projectmodel_id, task_id):
                 'task_detail', args=[projectmodel_id, task_id, ]))
         if 'worklog' in request.POST:
             worklog_form = WorklogForm(request.POST)
-            save_data_form(request, worklog_form, task_id)
+            commit_task(request, worklog_form, task_id)
         elif request.POST.get('comment'):
             comment_form = CommentForm(request.POST)
-            save_data_form(request, comment_form, task_id)
+            commit_task(request, comment_form, task_id)
 
     context_dict = {
         'comment_form': comment_form,

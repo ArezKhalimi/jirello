@@ -257,6 +257,8 @@ class TaskForm(forms.ModelForm):
     )
 
     def clean(self, *args, **kwargs):
+        if not 'original_estimate' in self.cleaned_data:
+            raise forms.ValidationError('No original estimate time')
         value = self.cleaned_data.pop('original_estimate')
         splitted_value = value.split(' ')
         real_time = 0
