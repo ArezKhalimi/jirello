@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from .TaskSearchView import TaskSearchView
+from .task_search_view import TaskSearchView
 from .edit_project import edit_project
 from .edit_sprint import edit_sprint
 from .edit_task import edit_task

@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 
 from guardian.decorators import permission_required_or_403 as perm
 
-from .models import ProjectModel
+from jirello.models import ProjectModel
 from jirello.forms import ProjectForm
 
 
