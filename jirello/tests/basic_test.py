@@ -47,7 +47,19 @@ class TestCreateProject(TestCase):
             password='top_secret',
             pk=2
         )
+        self.u2 = User.objects.create_user(
+            username='testuser2',
+            email='tu2@tu.tu',
+            password='top_secret',
+            pk=3
+        )
         self.c = Client()
+
+    def tearDown(self):
+        del self.factory
+        del self.u1
+        del self.u2
+        del self.c
 
     def test_client_surf(self):
         "access to project for Anon User;login in;Create new project;Try bad data input;"
@@ -79,3 +91,17 @@ class TestCreateProject(TestCase):
         self.assertFormError(response, 'form', 'title',
                              'This field is required.')
         self.assertEqual(ProjectModel.objects.count(), 1)
+        response = self.c.get('/jirello/projects/1/')
+        # assert False, response.__dict__
+        self.assertEqual(response.status_code, 200)
+        # logout
+        self.c.logout()
+        # sign in second user
+        self.c.login(
+            username=self.u2.username,
+            password='top_secret'
+        )
+        response = self.c.get('/jirello/projects/1/')
+        # Try to reach u1 project (forbiden)
+        self.assertEqual(response.status_code, 403)
+        self.c.logout()
