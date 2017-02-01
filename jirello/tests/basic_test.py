@@ -1,8 +1,6 @@
-from unittest import TestCase
-from django.core.urlresolvers import reverse
+from django.test import TestCase
 from django.test import Client, RequestFactory
 from jirello.models import *
-from jirello.views import new_project
 
 
 class TestBasic(TestCase):
@@ -40,18 +38,44 @@ class TestBasic2(TestCase):
         assert self.a == 2
 
 
-class Testcreate_project(TestCase):
+class TestCreateProject(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.u1 = User.objects.create_user(
-            username='testuser1', email='tu1@tu.tu', password='top_secret', pk=2
+            username='testuser1',
+            email='tu1@tu.tu',
+            password='top_secret',
+            pk=2
         )
+        self.c = Client()
 
-    def test_tt(self):
-        request = self.factory.post('jirello.new_project')
-        request.POST = {'title': 'blabla',
-                        'description': '123', 'users': [self.u1, ]}
-        request.user = self.u1
-        response = new_project(request)
+    def test_client_surf(self):
+        "access to project for Anon User;login in;Create new project;Try bad data input;"
+
+        response = self.c.get('/jirello/projects/', follow=True)
+        self.assertContains(response, 'login', status_code=200, html=False)
+        # now login in
+        self.c.login(
+            username=self.u1.username,
+            password='top_secret'
+        )
+        response = self.c.get('/jirello/projects/')
         self.assertEqual(response.status_code, 200)
+
+        # Create a new project
+        first_project_input = {
+            'title': 'sad',
+            'description': '123',
+            'users': [self.u1.pk, ]
+        }
+        response = self.c.post('/jirello/new_project/',
+                               data=first_project_input)
+        self.assertEqual(ProjectModel.objects.count(), 1)
+
+        # Field title error
+        first_project_input.pop('title')
+        response = self.c.post('/jirello/new_project/',
+                               data=first_project_input)
+        self.assertFormError(response, 'form', 'title',
+                             'This field is required.')
         self.assertEqual(ProjectModel.objects.count(), 1)
