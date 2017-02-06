@@ -1,17 +1,18 @@
 from django.db import models
-from .user_model import User
-from .project_model import ProjectModel
 from django.core.exceptions import ValidationError
 
 
 class Sprint(models.Model):
-    title = models.CharField(max_length=128, unique=True)
+    title = models.CharField(max_length=128)
     date_start = models.DateField()
     date_end = models.DateField()
-    is_active = models.BooleanField(blank=True)
+    is_active = models.BooleanField(default=False)
 
-    project = models.ForeignKey(to=ProjectModel, related_name='sprints')
-    owner = models.ForeignKey(to=User, related_name='created_sprints')
+    project = models.ForeignKey('jirello.ProjectModel', related_name='sprints')
+    owner = models.ForeignKey('jirello.User', related_name='created_sprints')
+
+    class Meta:
+        unique_together = (('title', 'project'))
 
     def __unicode__(self):
         return self.title

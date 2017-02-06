@@ -4,25 +4,26 @@ from django.http import HttpResponseRedirect
 
 from guardian.decorators import permission_required_or_403 as perm
 
-from jirello.models import ProjectModel, Task
-from jirello.forms import TaskForm
+from jirello.models import ProjectModel, Sprint
+from jirello.forms import SprintForm
 from jirello.views.delete_btn import delete_btn
 
 
 @perm('can_view', (ProjectModel, 'pk', 'projectmodel_id'))
-def edit_task(request, projectmodel_id, task_id):
-    task = Task.objects.get(pk=task_id)
-    form = TaskForm(projectmodel_id, instance=task)
+def sprint_edit(request, projectmodel_id, sprint_id):
+    sprint = Sprint.objects.get(pk=sprint_id)
+    form = SprintForm(instance=sprint)
     is_creator = request.user.has_perms('projectmodel.delete_projectmodel')
     if request.method == 'POST':
-        form = TaskForm(projectmodel_id, request.POST or None, instance=task)
-        # need add perm for delete ( just for project creator)
+        form = SprintForm(request.POST or None, instance=sprint)
+        # need add perm for delete ( just for project creator)has_perms
         if is_creator and request.POST.get('delete'):
-            return delete_btn(request, task, projectmodel_id)
+            return delete_btn(request, sprint, projectmodel_id)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse(
-                'task_detail', args=[projectmodel_id, task_id]))
+                'sprint-detail', args=[projectmodel_id, sprint_id]
+            ))
     return render(request, 'jirello/edit.html',
                   {
                       'form': form,

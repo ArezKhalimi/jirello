@@ -278,7 +278,7 @@ def project_detail(request, projectmodel_id):
     except project.IndexError:
         raise Http404("No project matches the given query.")
     sprints = Sprint.objects.filter(
-        project_id=projectmodel_id). \
+                project_id=projectmodel_id). \
         order_by('-is_active').prefetch_related('tasks')
     context_dict = {'project': project, 'sprints': sprints}
     return render(request, 'jirello/project_detail.html', context_dict)

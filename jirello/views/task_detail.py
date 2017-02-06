@@ -8,7 +8,7 @@ from jirello.models import ProjectModel, Task, Worklog, Comment
 from jirello.models.task_model import STATUSES
 from jirello.forms import WorklogForm, CommentForm
 from jirello.views.status_change import status_change
-from jirello.views.commit_task import commit_task
+from jirello.views.task_commit import task_commit
 
 
 @perm('can_view', (ProjectModel, 'pk', 'projectmodel_id'))
@@ -30,15 +30,15 @@ def task_detail(request, projectmodel_id, task_id):
                           request.POST.get('task_id'),
                           request.POST.get('status'))
             return HttpResponseRedirect(reverse(
-                'task_detail', args=[projectmodel_id, task_id, ]))
+                'task-detail', args=[projectmodel_id, task_id, ]))
         if 'worklog' in request.POST:
             worklog_form = WorklogForm(request.POST)
-            commit_task(request, worklog_form, task_id)
+            task_commit(request, worklog_form, task_id)
             return HttpResponseRedirect(reverse(
-                'task_detail', args=[projectmodel_id, task_id, ]))
+                'task-detail', args=[projectmodel_id, task_id, ]))
         elif request.POST.get('comment'):
             comment_form = CommentForm(request.POST)
-            commit_task(request, comment_form, task_id)
+            task_commit(request, comment_form, task_id)
 
     context_dict = {
         'comment_form': comment_form,

@@ -3,7 +3,7 @@ from django.db.models import F
 from jirello.models import Task
 
 
-def commit_task(request, form, task_id):
+def task_commit(request, form, task_id):
     if form.is_valid():
         f = form.save(commit=False)
         f.user = request.user

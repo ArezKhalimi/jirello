@@ -11,13 +11,13 @@
 {% endblock %}
 
 {% block menu %}
-    <li><a href="{% url 'project_detail' project_id %}">Back to project</a></li>
+    <li><a href="{% url 'project-detail' project_id %}">Back to project</a></li>
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Create <b class="caret"></b></a>
         <ul class="dropdown-menu">
-            <li><a href="{% url 'new_project' %}">New Project</a></li>
-            <li><a href="{% url 'new_sprint' project_id %}">New Sprint</a></li>
-            <li><a href="{% url 'new_task' project_id %}">New Task</a></li>
+            <li><a href="{% url 'project-new' %}">New Project</a></li>
+            <li><a href="{% url 'sprint-new' project_id %}">New Sprint</a></li>
+            <li><a href="{% url 'task-new' project_id %}">New Task</a></li>
         </ul>
     </li>
 {% endblock %}
@@ -26,7 +26,7 @@
 
 {% block maincontent%}
 <article class="col-sm-6 col-sm-offset-3">
-	<form id="form" method="POST" action="{% url 'new_task' project_id %}">
+	<form id="form" method="POST" action="{% url 'task-new' project_id %}">
 	    {% csrf_token %}
 	    {{form.as_p}}
 	    <div class="col-md-8 text-right">

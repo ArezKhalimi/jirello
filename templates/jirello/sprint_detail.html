@@ -2,18 +2,18 @@
 {% block title %}Jirello | {{ sprint.title }}{% endblock %}
 
 {% block header %}
-    <span class="title"><a href="{% url 'project_detail' projectmodel_id %}">{{sprint.project}}</a></span>
+    <span class="title"><a href="{% url 'project-detail' projectmodel_id %}">{{sprint.project}}</a></span>
     <span class="tagline">Sprint: '{{ sprint.title }}' directed by {{sprint.owner}}</span>
 {% endblock %}
 
 {% block menu %}
-    <li><a href="{% url 'edit_sprint' projectmodel_id=projectmodel_id sprint_id=sprint.id %}">Edit sprint</a></li>
+    <li><a href="{% url 'sprint-edit' projectmodel_id=projectmodel_id sprint_id=sprint.id %}">Edit sprint</a></li>
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Create <b class="caret"></b></a>
         <ul class="dropdown-menu">
-            <li><a href="{% url 'new_project' %}">New Project</a></li>
-            <li><a href="{% url 'new_sprint' projectmodel_id %}">New Sprint</a></li>
-            <li><a href="{% url 'new_task' projectmodel_id %}">New Task</a></li>
+            <li><a href="{% url 'project-new' %}">New Project</a></li>
+            <li><a href="{% url 'sprint-new' projectmodel_id %}">New Sprint</a></li>
+            <li><a href="{% url 'task-new' projectmodel_id %}">New Task</a></li>
         </ul>
     </li>
 {% endblock %}
@@ -37,12 +37,12 @@
 
 		{% for task in tasks%}
 		<div class="col-sm-6 col-md-3">
-			<h5><a href="{% url 'task_detail' projectmodel_id=projectmodel_id task_id=task.id%}" >
+			<h5><a href="{% url 'task-detail' projectmodel_id=projectmodel_id task_id=task.id%}" >
 			{{task.title}}
 			</a></h5>
 
 			<!-- Form for change  task status -->
-			<form id="status_form" method="POST" action="{% url 'sprint_detail' projectmodel_id sprint.id %}">
+			<form id="status_form" method="POST" action="{% url 'sprint-detail' projectmodel_id sprint.id %}">
 				{% csrf_token %}
 				<input type='hidden' value='{{ task.id }}' name='task_id'>
 				<select onchange="form.submit()" name='status'>

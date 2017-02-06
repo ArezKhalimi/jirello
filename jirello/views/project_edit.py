@@ -8,7 +8,7 @@ from jirello.forms import ProjectForm
 
 
 @perm('delete_projectmodel', (ProjectModel, 'pk', 'projectmodel_id'))
-def edit_project(request, projectmodel_id):
+def project_edit(request, projectmodel_id):
     project = ProjectModel.objects.get(pk=projectmodel_id)
     form = ProjectForm(instance=project)
     is_creator = request.user.has_perms('projectmodel.delete_projectmodel')

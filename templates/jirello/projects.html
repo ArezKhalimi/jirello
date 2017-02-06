@@ -11,7 +11,7 @@
 {% block maincontent%}
 <div class="row">
 <div class="col-lg-4" align="center">
-    <a href="{% url 'new_project' %}" class="btn btn-primary btn-lg">Create a new project</a>
+    <a href="{% url 'project-new' %}" class="btn btn-primary btn-lg">Create a new project</a>
 </div>
 </div>
 <div class="row section featured topspace">
@@ -20,9 +20,9 @@
         {% if projects_list%}
         	{% for project in projects_list %}
             <div class="col-sm-6 col-md-3">
-                <h3 class="text-center" ><a class='cross-a' href="{% url 'project_detail' projectmodel_id=project.id %}">{{project.title}}</a></h3>
+                <h3 class="text-center" ><a class='cross-a' href="{% url 'project-detail' projectmodel_id=project.id %}">{{project.title}}</a></h3>
                     <p class='cross'>{{project.description}}</p>
-                    <p class="text-center"><a href="{% url 'project_detail' projectmodel_id=project.id %}" class="btn btn-action">Details</a></p>
+                    <p class="text-center"><a href="{% url 'project-detail' projectmodel_id=project.id %}" class="btn btn-action">Details</a></p>
             </div>
         	{% endfor %}
         {% else %}

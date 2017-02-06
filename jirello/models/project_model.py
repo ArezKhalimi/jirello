@@ -1,13 +1,11 @@
 from django.db import models
-from .user_model import User
-#from django_elasticsearch.models import EsIndexable
 
 
 class ProjectModel(models.Model):
     title = models.CharField(max_length=128)
     description = models.TextField()
 
-    users = models.ManyToManyField(to=User, related_name='projects')
+    users = models.ManyToManyField('jirello.User', related_name='projects')
 
     class Meta:
         permissions = (

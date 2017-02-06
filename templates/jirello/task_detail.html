@@ -3,18 +3,18 @@
 {% block title %}Jirello | {{ task.title }}{% endblock %}
 
 {% block header %}
-    <span class="title"><a href="{% url 'project_detail' projectmodel_id %}">{{task.project}}</a></span>
+    <span class="title"><a href="{% url 'project-detail' projectmodel_id %}">{{task.project}}</a></span>
     <span class="tagline">Task: {{ task.title }}</span>
 {% endblock %}
 
 {% block menu %}
-    <li><a href="{% url 'edit_task' projectmodel_id=projectmodel_id task_id=task.id %}">Edit task</a></li>
+    <li><a href="{% url 'task-edit' projectmodel_id=projectmodel_id task_id=task.id %}">Edit task</a></li>
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Create <b class="caret"></b></a>
         <ul class="dropdown-menu">
-            <li><a href="{% url 'new_project' %}">New Project</a></li>
-            <li><a href="{% url 'new_sprint' projectmodel_id %}">New Sprint</a></li>
-            <li><a href="{% url 'new_task' projectmodel_id %}">New Task</a></li>
+            <li><a href="{% url 'project-new' %}">New Project</a></li>
+            <li><a href="{% url 'sprint-new' projectmodel_id %}">New Sprint</a></li>
+            <li><a href="{% url 'task-new' projectmodel_id %}">New Task</a></li>
         </ul>
     </li>
 {% endblock %}
@@ -38,7 +38,7 @@
                 <div class="pricing-table-features">
                     <p><strong>Kind:</strong> {{task.get_kind_display}}</p>
                     <p><strong>Status:</strong><br>
-                        <form id="status_form" method="POST" action="{% url 'task_detail' projectmodel_id task.id %}">
+                        <form id="status_form" method="POST" action="{% url 'task-detail' projectmodel_id task.id %}">
                             {% csrf_token %}
                             <input type='hidden' value='{{ task.id }}' name='task_id' >
                             <select onchange="form.submit()" name='status' class='form-control'>

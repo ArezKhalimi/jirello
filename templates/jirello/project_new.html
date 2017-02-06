@@ -12,7 +12,7 @@
 
 {% block maincontent%}
 <article class="col-sm-6 col-sm-offset-3">
-	<form id="form" method="POST" action="{% url 'new_project' %}">
+	<form id="form" method="POST" action="{% url 'project-new' %}">
 	    {% csrf_token %}
 	    {{form.as_p}}
 	    <div class="col-md-8 text-right">

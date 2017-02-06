@@ -8,7 +8,7 @@ from jirello.forms import ProjectForm
 
 
 @login_required()
-def new_project(request):
+def project_new(request):
     form = ProjectForm()
     if request.method == 'POST':
         form = ProjectForm(request.POST)
@@ -22,4 +22,4 @@ def new_project(request):
                     assign_perm('delete_projectmodel', u, form.instance)
             return HttpResponseRedirect('/jirello/projects')
     context_dict = {'form': form, }
-    return render(request, 'jirello/new_project.html', context_dict)
+    return render(request, 'jirello/project_new.html', context_dict)

@@ -1,67 +1,42 @@
 from django.db import models
-from .user_model import User
-from .sprint_model import Sprint
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 from django.core.urlresolvers import reverse
-
-STATUSES = (
-    (u'O', u'Open'),
-    (u'R', u'Ready to develop'),
-    (u'I', u'In progress'),
-    (u'C', u'Code Review'),
-    (u'V', u'Verification'),
-    (u'D', u'Done'),
-)
-
-STORYPOINTS = (
-    (1, '1'),
-    (2, '2'),
-    (3, '3'),
-    (4, '5'),
-    (5, '8'),
-    (6, '13'),
-    (7, '21'),
-)
-
-
-KIND = (
-    (u'E', u'Epic'),
-    (u'S', u'Story'),
-    (u'T', u'Task'),
-    (u'B', u'Bug'),
-    (u't', u'SubTask'),
-    (u'b', u'StoryBug'),
-)
+from jirello.choices import STATUSES, STORYPOINTS, KIND
 
 
 class Task(models.Model):
-    kind = models.CharField(max_length=2, choices=KIND, default='T')
-    status = models.CharField(max_length=2,
+    kind = models.CharField(max_length=1, choices=KIND, default=KIND.TASK)
+    status = models.CharField(max_length=1,
                               null=True,
                               choices=STATUSES,
-                              default='O')
+                              default=STATUSES.OPEN)
     title = models.CharField(max_length=128)
     description = models.TextField()
     original_estimate = models.PositiveIntegerField()
     remaining_estimate = models.PositiveIntegerField()
     storypoints = models.PositiveSmallIntegerField(null=True,
                                                    choices=STORYPOINTS,
-                                                   default=0)
+                                                   default=STORYPOINTS.ONE)
 
     project = models.ForeignKey('jirello.ProjectModel', related_name='tasks',)
-    worker = models.ManyToManyField(to=User, related_name='tasks')
-    sprints = models.ManyToManyField(to=Sprint, related_name='tasks',
-                                     blank=True)
-    owner = models.ForeignKey(to=User, related_name='created_tasks')
+    worker = models.ManyToManyField('jirello.User', related_name='tasks')
+    sprints = models.ManyToManyField(
+        'jirello.Sprint',
+        related_name='tasks',
+        blank=True
+    )
+    owner = models.ForeignKey('jirello.User', related_name='created_tasks')
     parent = models.ForeignKey(
         to='self', related_name='children', blank=True, null=True
     )
 
-
     @property
     def get_absolute_url(self):
-        return reverse('task_detail', kwargs={'projectmodel_id': self.project_id, 'task_id': self.pk })
+        return reverse(
+            'task-detail',
+            kwargs={'projectmodel_id': self.project_id, 'task_id': self.pk}
+        )
 
     @property
     def estimate_time(self):

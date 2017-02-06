@@ -101,7 +101,7 @@ class AuthenticationForm(forms.Form):
 
 class ProjectForm(forms.ModelForm):
     title = forms.CharField(
-        max_length=100,
+        max_length=128,
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control',

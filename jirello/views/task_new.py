@@ -7,7 +7,7 @@ from jirello.forms import TaskForm
 
 
 @login_required()
-def new_task(request, projectmodel_id):
+def task_new(request, projectmodel_id):
     form = TaskForm(projectmodel_id)
     if request.method == 'POST':
         form = TaskForm(
@@ -19,7 +19,7 @@ def new_task(request, projectmodel_id):
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse(
-                'project_detail', args=[projectmodel_id, ]
+                'project-detail', args=[projectmodel_id, ]
             ))
     context_dict = {'form': form, 'project_id': projectmodel_id, }
     return render(request, 'jirello/new_task.html', context_dict)
