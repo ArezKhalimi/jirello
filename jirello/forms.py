@@ -8,12 +8,21 @@ from jirello.models.comment_model import Comment
 from jirello.models.task_model import STATUSES, STORYPOINTS, KIND
 
 
-class RegistrationForm(forms.ModelForm):
+class StyleMixin(object):
+    #  all the fields in the form (exept picture) to inherit a bootstrap class
+    def __init__(self, *args, **kwargs):
+        unstyled_fields = ['picture', 'users', 'is_active']
+        super(StyleMixin, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if field not in unstyled_fields:
+                self.fields[field].widget.attrs['class'] = 'form-control'
+
+
+class RegistrationForm(StyleMixin, forms.ModelForm):
     # Form for registering a new account.
     username = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                'class': 'form-control',
                 'placeholder': 'Username',
             }
         ),
@@ -22,7 +31,6 @@ class RegistrationForm(forms.ModelForm):
     email = forms.EmailField(
         widget=forms.TextInput(
             attrs={
-                'class': 'form-control',
                 'placeholder': 'Email',
                 'id': "inputEmail",
             }
@@ -31,7 +39,6 @@ class RegistrationForm(forms.ModelForm):
     password1 = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form-control',
                 'placeholder': 'Password',
             }
         ),
@@ -40,7 +47,6 @@ class RegistrationForm(forms.ModelForm):
     password2 = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form-control',
                 'placeholder': 'Confirm Password',
             }
         ),
@@ -74,21 +80,16 @@ class RegistrationForm(forms.ModelForm):
             user.save()
 
 
-class AuthenticationForm(forms.Form):
+class AuthenticationForm(StyleMixin, forms.Form):
     # Login form
     username = forms.CharField(
         widget=forms.TextInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'Username',
-            }
+            attrs={'placeholder': 'Username', }
         ),
     )
     password = forms.CharField(
         widget=forms.PasswordInput(
-            attrs={'class': 'form-control',
-                   'placeholder': 'Password',
-                   }
+            attrs={'placeholder': 'Password', }
         ),
     )
 
@@ -99,26 +100,7 @@ class AuthenticationForm(forms.Form):
         ]
 
 
-class ProjectForm(forms.ModelForm):
-    title = forms.CharField(
-        max_length=128,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'Project Title',
-            }
-        ),
-    )
-    description = forms.CharField(
-        max_length=206,
-        widget=forms.Textarea(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'Description',
-                'rows': '4',
-            }
-        ),
-    )
+class ProjectForm(StyleMixin, forms.ModelForm):
     users = forms.ModelMultipleChoiceField(
         # exclude AnonymousUser (special user for django-guardian)
         queryset=User.objects.all().exclude(pk=1),
@@ -132,14 +114,30 @@ class ProjectForm(forms.ModelForm):
             'description',
             'users',
         ]
+        field_classes = {
+            'title': forms.CharField(max_length=128),
+            'description': forms.CharField(max_length=206),
+        }
+        widgets = {
+            'title': forms.TextInput(
+                attrs={
+                    'placeholder': 'Project Title',
+                }
+            ),
+            'description': forms.Textarea(
+                attrs={
+                    'placeholder': 'Description',
+                    'rows': '4',
+                }
+            ),
+        }
 
 
-class SprintForm(forms.ModelForm):
+class SprintForm(StyleMixin, forms.ModelForm):
     title = forms.CharField(
         max_length=100,
         widget=forms.TextInput(
             attrs={
-                'class': 'form-control',
                 'placeholder': 'Title of sprint',
             }
         ),
@@ -148,7 +146,6 @@ class SprintForm(forms.ModelForm):
     date_start = forms.DateField(
         widget=forms.DateInput(
             attrs={
-                'class': 'form-control',
                 'id': 'datepicker',
                 'placeholder': 'Sprint start date',
             },
@@ -160,7 +157,6 @@ class SprintForm(forms.ModelForm):
     date_end = forms.DateField(
         widget=forms.DateInput(
             attrs={
-                'class': 'form-control',
                 'id': 'datepicker-1',
                 'placeholder': 'Sprint end date',
             },
@@ -183,7 +179,7 @@ class SprintForm(forms.ModelForm):
 # placeholder and help_text to template
 
 
-class TaskForm(forms.ModelForm):
+class TaskForm(StyleMixin, forms.ModelForm):
 
     def __init__(self, projectmodel_id, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -199,9 +195,6 @@ class TaskForm(forms.ModelForm):
         self.fields["sprints"].help_text = 'Use CTRL for multiple choices'
         self.fields["parent"].queryset = Task.objects.filter(
             project_id=projectmodel_id)
-        self.fields["worker"].widget.attrs = {'class': 'form-control', }
-        self.fields["sprints"].widget.attrs = {'class': 'form-control', }
-        self.fields["parent"].widget.attrs = {'class': 'form-control', }
 
     status = forms.ChoiceField(choices=STATUSES)
 
@@ -210,14 +203,12 @@ class TaskForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control',
-                'placeholder': 'Title of task',
             }
         ),
     )
     description = forms.CharField(
         widget=forms.Textarea(
             attrs={
-                'class': 'form-control',
                 'placeholder': 'Description of task',
                 'rows': '4',
             }
@@ -226,38 +217,26 @@ class TaskForm(forms.ModelForm):
     original_estimate = forms.CharField(
         max_length=10,
         widget=forms.TextInput(
-            attrs={'class': 'form-control',
-                   'placeholder': 'Add h or H for hours & m or M for minutes',
-                   }
+            attrs={
+                'placeholder': 'Add h or H for hours & m or M for minutes',
+            }
         )
     )
     storypoints = forms.ChoiceField(
         choices=STORYPOINTS,
-        widget=forms.Select(
-            attrs={
-                'class': 'form-control',
-            }
-        ),
+        widget=forms.Select(),
     )
     kind = forms.ChoiceField(
         choices=KIND,
-        widget=forms.Select(
-            attrs={
-                'class': 'form-control',
-            }
-        ),
+        widget=forms.Select(),
     )
     status = forms.ChoiceField(
         choices=STATUSES,
-        widget=forms.Select(
-            attrs={
-                'class': 'form-control',
-            }
-        ),
+        widget=forms.Select(),
     )
 
     def clean(self, *args, **kwargs):
-        if not 'original_estimate' in self.cleaned_data:
+        if 'original_estimate' not in self.cleaned_data:
             raise forms.ValidationError('No original estimate time')
         value = self.cleaned_data.pop('original_estimate')
         splitted_value = value.split(' ')
@@ -302,41 +281,24 @@ class TaskForm(forms.ModelForm):
         ]
 
 
-class CommentForm(forms.ModelForm):
-    comment = forms.CharField(
-        max_length=400,
-        widget=forms.Textarea(
-            attrs={
-                'class': 'form-control',
-                'rows': '6',
-            }
-        ),
-    )
+class CommentForm(StyleMixin, forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = [
-            'comment',
-        ]
+        fields = ['comment', ]
+        widgets = {
+            'comment': forms.Textarea(attrs={'cols': 40, 'rows': 6}),
+        }
 
 
-class WorklogForm(forms.ModelForm):
+class WorklogForm(CommentForm, forms.ModelForm):
     time_spend = forms.CharField(
         max_length=10,
         widget=forms.TextInput(
-            attrs={'class': 'form-control',
-                   'placeholder': 'Add h or H for hours & m or M for minutes',
-                   }
-        )
-    )
-    comment = forms.CharField(
-        max_length=400,
-        widget=forms.Textarea(
             attrs={
-                'class': 'form-control',
-                'rows': '2',
+                'placeholder': 'Add h or H for hours & m or M for minutes',
             }
-        ),
+        )
     )
 
     class Meta:
