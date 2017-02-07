@@ -1,1 +1,1 @@
-debug_toolbar==1.6
+django-debug-toolbar==1.6

@@ -5,3 +5,4 @@ celery[redis]
 django-guardian==1.4.6
 django-haystack==2.6.0
 django_celery_beat==1.0.1
+'elasticsearch>=2.4.0, <=2.9'

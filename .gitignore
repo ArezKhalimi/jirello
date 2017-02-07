@@ -2,6 +2,7 @@
 *.png
 *.jpg
 *.jpeg
+db.sqlite3
 secure.py
 celerybeat-schedule
 dump.rdb
